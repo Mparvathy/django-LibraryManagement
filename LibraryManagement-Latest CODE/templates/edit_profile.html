@@ -1,0 +1,195 @@
+{% extends 'base3.html' %}
+{% load static %}
+{% block content %}
+
+<!-- Toast -->
+<div style="position:fixed;top:80px;right:1.5rem;z-index:9999;display:flex;flex-direction:column;gap:10px;">
+  {% for message in messages %}
+  <div class="lms-ep-toast {% if 'error' in message.tags %}toast-error{% else %}toast-success{% endif %}" style="background:#fff;border:0.5px solid #e8d5a3;border-radius:8px;padding:12px 42px 12px 14px;min-width:280px;max-width:360px;position:relative;animation:lms-slide-in 0.25s ease;">
+    <div style="font-size:13px;font-weight:600;color:#1a2a4a;margin-bottom:2px;">{% if 'error' in message.tags %}Error{% else %}Success{% endif %}</div>
+    <div style="font-size:12.5px;color:#5a6a82;">{{ message }}</div>
+    <button onclick="this.closest('.lms-ep-toast').remove()" style="position:absolute;top:8px;right:10px;background:none;border:none;font-size:16px;color:#aaa;cursor:pointer;">&times;</button>
+  </div>
+  {% endfor %}
+</div>
+
+<style>
+  @keyframes lms-slide-in { from { opacity:0; transform:translateX(30px); } to { opacity:1; transform:translateX(0); } }
+  @keyframes lms-fade-out  { from { opacity:1; } to { opacity:0; transform:translateX(30px); } }
+  .toast-success { border-left: 4px solid #1d9e75; }
+  .toast-error   { border-left: 4px solid #e24b4a; }
+
+  .add-book-wrap {
+    min-height: calc(100vh - 64px);
+    display: flex; align-items: center; justify-content: center;
+    padding: 2rem 1rem; background: #fdf8f0;
+  }
+
+  .add-book-card {
+    background: #fff; border: 0.5px solid #e8d5a3;
+    border-radius: 14px; width: 100%; max-width: 460px;
+    padding: 2rem; box-shadow: 0 2px 12px rgba(184,134,11,0.08);
+  }
+
+  .add-book-header { text-align: center; margin-bottom: 1.5rem; }
+
+  .profile-avatar-wrap {
+    position: relative; width: 80px; height: 80px;
+    margin: 0 auto 0.75rem; cursor: pointer;
+  }
+
+  .profile-avatar {
+    width: 80px; height: 80px; border-radius: 50%;
+    border: 3px solid #e8d5a3; object-fit: cover;
+    background: #fdf3d8; display: flex; align-items: center;
+    justify-content: center; font-size: 1.8rem; font-weight: 700;
+    color: #b8860b; overflow: hidden;
+  }
+
+  .avatar-edit-btn {
+    position: absolute; bottom: 0; right: 0;
+    width: 26px; height: 26px; background: #1a2a4a;
+    border-radius: 50%; display: flex; align-items: center;
+    justify-content: center; cursor: pointer; border: 2px solid #fff;
+  }
+
+  .add-book-header h2 { font-size: 1.1rem; font-weight: 600; color: #1a2a4a; margin: 0; }
+  .add-book-header p  { font-size: 12.5px; color: #7a8a9a; margin: 0.2rem 0 0; }
+
+  hr.divider { border: none; border-top: 0.5px solid #f0e8d0; margin: 1.25rem 0; }
+
+  .lms-field { margin-bottom: 0.85rem; }
+  .lms-field label { display: block; font-size: 12px; font-weight: 500; color: #4a5568; margin-bottom: 4px; }
+
+  .lms-field input,
+  .lms-field select {
+    width: 100%; height: 38px;
+    border: 0.5px solid #ddd; border-radius: 7px;
+    padding: 0 11px; font-size: 13px; color: #1a2a4a;
+    background: #fdfaf5; outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+
+  .lms-field select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23b8860b' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 11px center;
+    cursor: pointer;
+  }
+
+  .lms-field input:focus,
+  .lms-field select:focus {
+    border-color: #c8a84b;
+    box-shadow: 0 0 0 3px rgba(200,168,75,0.12);
+    background-color: #fff;
+  }
+
+  .btn-row { display: flex; gap: 8px; margin-top: 0.5rem; }
+
+  .lms-submit-btn {
+    flex: 1; height: 40px; background: #1a2a4a;
+    color: #fff; border: none; border-radius: 7px;
+    font-size: 13.5px; font-weight: 500; cursor: pointer;
+    transition: background 0.15s;
+  }
+  .lms-submit-btn:hover { background: #b8860b; }
+
+  .lms-back-btn {
+    flex: 1; height: 40px; background: #fdf3d8; color: #7a5800;
+    border: 0.5px solid #e8d5a3; border-radius: 7px;
+    font-size: 13.5px; font-weight: 500; text-decoration: none;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s;
+  }
+  .lms-back-btn:hover { background: #b8860b; color: #fff; text-decoration: none; }
+</style>
+
+<div class="add-book-wrap">
+  <div class="add-book-card">
+
+    <div class="add-book-header">
+      <div class="profile-avatar-wrap" onclick="document.getElementById('picInput').click()">
+        <div class="profile-avatar" id="avatarPreview">
+          {% if user.profile_pic %}
+            <img src="{{ user.profile_pic.url }}" id="previewImg" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
+          {% else %}
+            <span id="avatarInitial">{{ user.first_name|first|upper }}</span>
+          {% endif %}
+        </div>
+        <div class="avatar-edit-btn">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </div>
+      </div>
+      <h2>Edit Profile</h2>
+      <p>Update your personal information</p>
+    </div>
+
+    <hr class="divider">
+
+    <form method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+      <input type="file" id="picInput" name="profile_pic" accept="image/*" style="display:none;" onchange="previewPic(this)">
+
+      <div class="lms-field">
+        <label>Full Name</label>
+        <input type="text" name="first_name" value="{{ user.first_name }}">
+      </div>
+
+      <div class="lms-field">
+        <label>Email</label>
+        <input type="email" name="email" value="{{ user.email }}">
+      </div>
+
+      <div class="lms-field">
+        <label>Phone</label>
+        <input type="tel" name="phone" value="{{ user.phone|default:'' }}">
+      </div>
+
+      <div class="lms-field">
+        <label>Enrollment</label>
+        <input type="text" name="enrollment" value="{{ user.enrollment|default:'' }}">
+      </div>
+
+      <div class="lms-field">
+        <label>Branch</label>
+        <select name="branch">
+          <option value="">-- Select Branch --</option>
+          {% for b in branches %}
+          <option value="{{ b.id }}" {% if user.branch and user.branch.id == b.id %}selected{% endif %}>{{ b.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="btn-row">
+        <button type="submit" class="lms-submit-btn">Save Changes</button>
+        <a href="{% url 'profile' %}" class="lms-back-btn">Cancel</a>
+      </div>
+    </form>
+
+  </div>
+</div>
+
+<script>
+  function previewPic(input) {
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const preview = document.getElementById('avatarPreview');
+        preview.innerHTML = '<img src="' + e.target.result + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.lms-ep-toast').forEach(function (t) {
+      setTimeout(function () {
+        t.style.animation = 'lms-fade-out 0.3s ease forwards';
+        setTimeout(function () { t.remove(); }, 300);
+      }, 4000);
+    });
+  });
+</script>
+
+{% endblock %}

@@ -1,0 +1,86 @@
+{% extends 'base3.html' %}
+{% block content %}
+
+<style>
+  .page-wrap { max-width: 900px; margin: 2rem auto; padding: 0 1.25rem; }
+
+  .page-heading {
+    font-size: 1.1rem; font-weight: 600; color: #7a5800;
+    margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between;
+  }
+  .page-heading-left { display: flex; align-items: center; gap: 8px; }
+  .page-heading-left span { display: inline-block; width: 4px; height: 18px; background: #b8860b; border-radius: 3px; }
+
+  .lms-table-wrap {
+    background: #fff; border: 0.5px solid #e8d5a3;
+    border-radius: 12px; overflow: hidden;
+    box-shadow: 0 2px 8px rgba(184,134,11,0.07);
+  }
+
+  .lms-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+
+  .lms-table thead tr { background: #fdf3d8; border-bottom: 1px solid #e8d5a3; }
+  .lms-table thead th {
+    padding: 11px 14px; font-size: 11.5px; font-weight: 600;
+    color: #7a5800; text-transform: uppercase; letter-spacing: 0.07em; text-align: left;
+  }
+
+  .lms-table tbody tr { border-bottom: 0.5px solid #f0e8d0; transition: background 0.12s; }
+  .lms-table tbody tr:last-child { border-bottom: none; }
+  .lms-table tbody tr:hover { background: #fffdf7; }
+  .lms-table tbody td { padding: 10px 14px; color: #3a4a5a; vertical-align: middle; }
+
+  .badge-returned { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; background: #e8f0fe; color: #1a73e8; }
+
+  .btn-back {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 14px; background: #fdf3d8; color: #7a5800;
+    border: 0.5px solid #e8d5a3; border-radius: 7px;
+    font-size: 13px; font-weight: 500; text-decoration: none;
+    transition: background 0.15s;
+  }
+  .btn-back:hover { background: #b8860b; color: #fff; border-color: #b8860b; text-decoration: none; }
+
+  .empty-state { text-align: center; padding: 3rem 1rem; color: #9a8060; font-size: 14px; }
+</style>
+
+<div class="page-wrap">
+  <div class="page-heading">
+    <div class="page-heading-left">
+      <span></span> Returned Books
+    </div>
+    <a href="{% url 'studentdashboard' %}" class="btn-back">
+      <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M10 7H2M5 4L2 7l3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Back to Dashboard
+    </a>
+  </div>
+
+  <div class="lms-table-wrap">
+    <table class="lms-table">
+      <thead>
+        <tr>
+          <th>Book Name</th>
+          <th>Author</th>
+          <th>Issue Date</th>
+          <th>Return Date</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for issue in returned_books %}
+        <tr>
+          <td>{{ issue.book.name }}</td>
+          <td>{{ issue.book.author }}</td>
+          <td>{{ issue.issue_date }}</td>
+          <td>{{ issue.return_date }}</td>
+          <td><span class="badge-returned">Returned</span></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5" class="empty-state">No books returned yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

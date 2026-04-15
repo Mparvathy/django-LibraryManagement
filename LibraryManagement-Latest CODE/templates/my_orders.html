@@ -1,0 +1,253 @@
+{% extends 'base3.html' %}
+{% block content %}
+
+<style>
+  .page-wrap { max-width: 900px; margin: 2rem auto; padding: 0 1.25rem; }
+
+  .page-heading { font-size: 1.1rem; font-weight: 600; color: #7a5800; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 8px; }
+  .page-heading span { display: inline-block; width: 4px; height: 18px; background: #b8860b; border-radius: 3px; }
+
+  .order-card { background: #fff; border: 0.5px solid #e8d5a3; border-radius: 12px; margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(184,134,11,0.07); overflow: hidden; }
+
+  /* Summary row */
+  .order-summary {
+    padding: 14px 18px;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 10px; cursor: pointer;
+    background: #fdf3d8;
+  }
+  .order-summary:hover { background: #faecc5; }
+
+  .order-meta-group { display: flex; gap: 28px; flex-wrap: wrap; align-items: center; }
+
+  .order-meta { }
+  .order-meta .label { font-size: 10px; font-weight: 700; color: #9a8060; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 2px; }
+  .order-meta .value { font-size: 13.5px; font-weight: 600; color: #1a2a4a; }
+  .order-meta .value.green { color: #1e8e3e; }
+
+  .order-summary-right { display: flex; align-items: center; gap: 8px; }
+
+  .badge-status { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 11.5px; font-weight: 600; }
+  .badge-placed     { background: #e8f0fe; color: #1a73e8; }
+  .badge-processing { background: #fef7e0; color: #b8860b; }
+  .badge-shipped    { background: #e6f4ea; color: #1e8e3e; }
+  .badge-delivered  { background: #f1f3f4; color: #3a4a5a; }
+
+  .btn-view {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 6px 14px; background: #1a2a4a; color: #fff;
+    border: none; border-radius: 7px; font-size: 12px; font-weight: 500;
+    cursor: pointer; transition: background 0.15s;
+  }
+  .btn-view:hover { background: #b8860b; }
+
+  /* Details panel */
+  .order-details { display: none; border-top: 0.5px solid #e8d5a3; }
+  .order-details.open { display: block; }
+
+  /* Tracking */
+  .tracking-section { padding: 16px 18px; border-bottom: 0.5px solid #f0e8d0; }
+  .tracking-label { font-size: 10.5px; font-weight: 700; color: #9a8060; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 14px; }
+
+  .tracking-bar { display: flex; align-items: flex-start; justify-content: space-between; position: relative; padding: 0 16px; }
+
+  .tracking-bar::before {
+    content: ''; position: absolute;
+    top: 16px; left: 32px; right: 32px; height: 2px;
+    background: #e8d5a3; z-index: 0;
+  }
+
+  .t-step { display: flex; flex-direction: column; align-items: center; position: relative; z-index: 1; flex: 1; }
+
+  .t-dot {
+    width: 34px; height: 34px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; border: 2px solid #e8d5a3;
+    background: #fff; margin-bottom: 6px; position: relative; z-index: 2;
+  }
+
+  .t-step.done   .t-dot { background: #b8860b; border-color: #b8860b; }
+  .t-step.active .t-dot { background: #1a2a4a; border-color: #1a2a4a; }
+  .t-step.pending .t-dot { background: #fff; border-color: #e8d5a3; }
+
+  .t-label { font-size: 11px; font-weight: 500; color: #9a8060; text-align: center; }
+  .t-step.done   .t-label { color: #b8860b; font-weight: 600; }
+  .t-step.active .t-label { color: #1a2a4a; font-weight: 700; }
+
+  /* Progress line fill */
+  .tracking-progress {
+    position: absolute; top: 16px; left: 32px; height: 2px;
+    background: #b8860b; z-index: 1; transition: width 0.3s;
+  }
+
+  /* Books table */
+  .books-section { padding: 14px 18px; }
+  .books-label { font-size: 10.5px; font-weight: 700; color: #9a8060; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+
+  .lms-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .lms-table thead tr { background: #fdf3d8; }
+  .lms-table thead th { padding: 8px 12px; font-size: 11px; font-weight: 600; color: #7a5800; text-transform: uppercase; letter-spacing: 0.07em; text-align: left; }
+  .lms-table tbody tr { border-bottom: 0.5px solid #f0e8d0; }
+  .lms-table tbody tr:last-child { border-bottom: none; }
+  .lms-table tbody td { padding: 8px 12px; color: #3a4a5a; }
+  .lms-table tfoot td { padding: 8px 12px; font-weight: 700; color: #1a2a4a; background: #fdf3d8; }
+
+  .btn-receipt {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 6px 14px; background: #fdf3d8; color: #7a5800;
+    border: 0.5px solid #e8d5a3; border-radius: 7px;
+    font-size: 12px; font-weight: 500; text-decoration: none;
+    transition: background 0.15s;
+  }
+  .btn-receipt:hover { background: #b8860b; color: #fff; text-decoration: none; }
+
+  .empty-state { text-align: center; padding: 3rem 1rem; color: #9a8060; font-size: 14px; background: #fff; border: 0.5px solid #e8d5a3; border-radius: 12px; }
+</style>
+
+<div class="page-wrap">
+  <div class="page-heading"><span></span> My Orders</div>
+
+  {% if order_data %}
+    {% for item in order_data %}
+    <div class="order-card">
+
+      <!-- Summary Row -->
+      <div class="order-summary" onclick="toggleDetails('details-{{ item.order.id }}', this)">
+        <div class="order-meta-group">
+          <div class="order-meta">
+            <div class="label">Order ID</div>
+            <div class="value">#{{ item.order.id }}</div>
+          </div>
+          <div class="order-meta">
+            <div class="label">Order Date</div>
+            <div class="value">{{ item.order.created_at|date:"d M Y" }}</div>
+          </div>
+          <div class="order-meta">
+            <div class="label">Est. Delivery</div>
+            <div class="value">{{ item.estimated_delivery|date:"d M Y" }}</div>
+          </div>
+          <div class="order-meta">
+            <div class="label">Total</div>
+            <div class="value green">₹{{ item.order.total_price }}</div>
+          </div>
+          <div class="order-meta">
+            <div class="label">Status</div>
+            <div class="value">
+              <span class="badge-status badge-{{ item.status }}">{{ item.order.get_delivery_status_display }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="order-summary-right">
+          <a href="{% url 'download_transaction_details' item.order.id %}" class="btn-receipt" onclick="event.stopPropagation()">
+            <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M7 1v8M4 6l3 3 3-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 11h10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+            Receipt
+          </a>
+          <button class="btn-view" onclick="event.stopPropagation();toggleDetails('details-{{ item.order.id }}', this)">
+            <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M1 7s2.5-5 6-5 6 5 6 5-2.5 5-6 5-6-5-6-5z" stroke="currentColor" stroke-width="1.3"/><circle cx="7" cy="7" r="2" stroke="currentColor" stroke-width="1.3"/></svg>
+            View Details
+          </button>
+        </div>
+      </div>
+
+      <!-- Details Panel -->
+      <div class="order-details" id="details-{{ item.order.id }}">
+
+        <!-- Tracking -->
+        <div class="tracking-section">
+          <div class="tracking-label">Order Tracking</div>
+          <div class="tracking-bar" style="position:relative;">
+
+            {% if item.status == 'placed' %}
+              <div class="tracking-progress" style="width:0%;"></div>
+            {% elif item.status == 'processing' %}
+              <div class="tracking-progress" style="width:37%;"></div>
+            {% elif item.status == 'shipped' %}
+              <div class="tracking-progress" style="width:67%;"></div>
+            {% elif item.status == 'delivered' %}
+              <div class="tracking-progress" style="width:100%;"></div>
+            {% endif %}
+
+            <!-- Step 1: Order Placed -->
+            <div class="t-step done">
+              <div class="t-dot">✓</div>
+              <div class="t-label">Order Placed</div>
+            </div>
+
+            <!-- Step 2: Payment Done -->
+            <div class="t-step done">
+              <div class="t-dot">✓</div>
+              <div class="t-label">Payment Done</div>
+            </div>
+
+            <!-- Step 3: Processing -->
+            <div class="t-step {% if item.status == 'processing' %}active{% elif item.status == 'shipped' or item.status == 'delivered' %}done{% else %}pending{% endif %}">
+              <div class="t-dot">📦</div>
+              <div class="t-label">Processing</div>
+            </div>
+
+            <!-- Step 4: Shipped -->
+            <div class="t-step {% if item.status == 'shipped' %}active{% elif item.status == 'delivered' %}done{% else %}pending{% endif %}">
+              <div class="t-dot">🚚</div>
+              <div class="t-label">Shipped</div>
+            </div>
+
+            <!-- Step 5: Delivered -->
+            <div class="t-step {% if item.status == 'delivered' %}active{% else %}pending{% endif %}">
+              <div class="t-dot">🏠</div>
+              <div class="t-label">Delivered</div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Books -->
+        <div class="books-section">
+          <div class="books-label">Books Purchased</div>
+          <table class="lms-table">
+            <thead>
+              <tr><th>Book Name</th><th>Author</th><th>Category</th><th>Price</th></tr>
+            </thead>
+            <tbody>
+              {% for book in item.books %}
+              <tr>
+                <td>{{ book.name }}</td>
+                <td>{{ book.author }}</td>
+                <td>{{ book.category }}</td>
+                <td>₹{{ book.price }}</td>
+              </tr>
+              {% empty %}
+              <tr><td colspan="4" style="text-align:center;color:#9a8060;">No books found</td></tr>
+              {% endfor %}
+            </tbody>
+            <tfoot>
+              <tr><td colspan="3">Total</td><td>₹{{ item.order.total_price }}</td></tr>
+            </tfoot>
+          </table>
+        </div>
+
+      </div>
+    </div>
+    {% endfor %}
+
+  {% else %}
+  <div class="empty-state">
+    <div style="font-size:2rem;margin-bottom:0.75rem;">📦</div>
+    <div style="font-weight:600;color:#1a2a4a;margin-bottom:0.4rem;">No orders yet</div>
+    <div style="font-size:13px;">You haven't purchased any books yet.</div>
+    <a href="{% url 'view_books1' %}" style="display:inline-flex;align-items:center;gap:6px;margin-top:1rem;padding:9px 20px;background:#1a2a4a;color:#fff;border-radius:8px;font-size:13px;font-weight:500;text-decoration:none;">Browse Books</a>
+  </div>
+  {% endif %}
+</div>
+
+<script>
+  function toggleDetails(id, btn) {
+    const panel = document.getElementById(id);
+    panel.classList.toggle('open');
+    const btnEl = document.querySelector('[onclick*="' + id + '"].btn-view');
+    if (btnEl) {
+      btnEl.textContent = panel.classList.contains('open') ? '▲ Hide' : '👁 View Details';
+    }
+  }
+</script>
+
+{% endblock %}

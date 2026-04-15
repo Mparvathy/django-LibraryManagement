@@ -1,0 +1,158 @@
+{% extends 'base3.html' %}
+{% block content %}
+
+<!-- Toast -->
+<div style="position:fixed;top:80px;right:1.5rem;z-index:9999;display:flex;flex-direction:column;gap:10px;">
+  {% for message in messages %}
+  <div class="lms-mi-toast {% if 'error' in message.tags %}toast-error{% elif 'warning' in message.tags %}toast-warning{% else %}toast-success{% endif %}" style="background:#fff;border:0.5px solid #e8d5a3;border-radius:8px;padding:12px 42px 12px 14px;min-width:280px;max-width:360px;position:relative;animation:lms-slide-in 0.25s ease;">
+    <div style="font-size:13px;font-weight:600;color:#1a2a4a;margin-bottom:2px;">
+      {% if 'error' in message.tags %}Error{% elif 'warning' in message.tags %}Warning{% else %}Success{% endif %}
+    </div>
+    <div style="font-size:12.5px;color:#5a6a82;">{{ message }}</div>
+    <button onclick="this.closest('.lms-mi-toast').remove()" style="position:absolute;top:8px;right:10px;background:none;border:none;font-size:16px;color:#aaa;cursor:pointer;">&times;</button>
+  </div>
+  {% endfor %}
+</div>
+
+<style>
+  @keyframes lms-slide-in { from { opacity:0; transform:translateX(30px); } to { opacity:1; transform:translateX(0); } }
+  @keyframes lms-fade-out  { from { opacity:1; } to { opacity:0; transform:translateX(30px); } }
+  .toast-success { border-left: 4px solid #1d9e75; }
+  .toast-error   { border-left: 4px solid #e24b4a; }
+  .toast-warning { border-left: 4px solid #f59e0b; }
+
+  .page-wrap { max-width: 1100px; margin: 2rem auto; padding: 0 1.25rem; }
+
+  .page-heading {
+    font-size: 1.1rem; font-weight: 600; color: #7a5800;
+    margin-bottom: 1.5rem; display: flex; align-items: center; gap: 8px;
+  }
+  .page-heading span { display: inline-block; width: 4px; height: 18px; background: #b8860b; border-radius: 3px; }
+
+  .lms-table-wrap {
+    background: #fff; border: 0.5px solid #e8d5a3;
+    border-radius: 12px; overflow: hidden;
+    box-shadow: 0 2px 8px rgba(184,134,11,0.07);
+  }
+
+  .lms-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+
+  .lms-table thead tr { background: #fdf3d8; border-bottom: 1px solid #e8d5a3; }
+  .lms-table thead th {
+    padding: 11px 14px; font-size: 11.5px; font-weight: 600;
+    color: #7a5800; text-transform: uppercase; letter-spacing: 0.07em;
+    text-align: left; white-space: nowrap;
+  }
+
+  .lms-table tbody tr { border-bottom: 0.5px solid #f0e8d0; transition: background 0.12s; }
+  .lms-table tbody tr:last-child { border-bottom: none; }
+  .lms-table tbody tr:hover { background: #fffdf7; }
+  .lms-table tbody td { padding: 10px 14px; color: #3a4a5a; vertical-align: middle; }
+
+  .badge-status {
+    display: inline-block; padding: 3px 10px;
+    border-radius: 20px; font-size: 11px; font-weight: 600;
+  }
+  .badge-paid     { background: #e6f4ea; color: #1e8e3e; }
+  .badge-unpaid   { background: #fce8e6; color: #d93025; }
+  .badge-returned { background: #e8f0fe; color: #1a73e8; }
+  .badge-overdue  { background: #fef7e0; color: #b8860b; }
+
+  .btn-lms {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 5px 11px; font-size: 12px; font-weight: 500;
+    border-radius: 6px; border: 0.5px solid transparent;
+    cursor: pointer; text-decoration: none; transition: background 0.13s;
+    white-space: nowrap;
+  }
+  .btn-return  { background: #e6f4ea; color: #1e8e3e; border-color: #a8d5b5; }
+  .btn-return:hover  { background: #1e8e3e; color: #fff; }
+  .btn-pay    { background: #fce8e6; color: #d93025; border-color: #f5b8b4; }
+  .btn-pay:hover    { background: #d93025; color: #fff; }
+
+  .empty-state { text-align: center; padding: 3rem 1rem; color: #9a8060; font-size: 14px; }
+</style>
+
+<div class="page-wrap">
+  <div class="page-heading">
+    <span></span> My Issued Books
+  </div>
+
+  <div class="lms-table-wrap">
+    {% if issued_books %}
+    <table class="lms-table">
+      <thead>
+        <tr>
+          <th>Book Title</th>
+          <th>Author</th>
+          <th>Issue Date</th>
+          <th>Due Date</th>
+          <th>Return Date</th>
+          <th>Fine</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for issue in issued_books %}
+        <tr>
+          <td>{{ issue.book.name }}</td>
+          <td>{{ issue.book.author }}</td>
+          <td>{{ issue.issue_date }}</td>
+          <td>
+            {{ issue.due_date }}
+            {% if issue.due_date < current_date and not issue.is_returned %}
+              <span class="badge-status badge-overdue">Overdue</span>
+            {% endif %}
+          </td>
+          <td>{{ issue.return_date|default:"Not Returned" }}</td>
+          <td>
+            {% if issue.fine > 0 %}
+              ₹{{ issue.fine }}
+              {% if issue.fine_paid %}
+                <span class="badge-status badge-paid">Paid</span>
+              {% else %}
+                <span class="badge-status badge-unpaid">Unpaid</span>
+              {% endif %}
+            {% else %}
+              <span style="color:#9a8060;">—</span>
+            {% endif %}
+          </td>
+          <td>
+            <div style="display:flex;gap:5px;flex-wrap:wrap;">
+              {% if not issue.is_returned %}
+                <form method="post" style="margin:0;">
+                  {% csrf_token %}
+                  <input type="hidden" name="issue_id" value="{{ issue.id }}">
+                  <input type="hidden" name="action" value="return">
+                  <button type="submit" class="btn-lms btn-return">Return</button>
+                </form>
+              {% else %}
+                <span class="badge-status badge-returned">Returned</span>
+              {% endif %}
+              {% if issue.fine > 0 and not issue.fine_paid %}
+                <a href="{% url 'pay_fine' issue.id %}" class="btn-lms btn-pay">Pay Fine</a>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">No books have been issued to you yet.</div>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.lms-mi-toast').forEach(function (t) {
+      setTimeout(function () {
+        t.style.animation = 'lms-fade-out 0.3s ease forwards';
+        setTimeout(function () { t.remove(); }, 300);
+      }, 4000);
+    });
+  });
+</script>
+
+{% endblock %}

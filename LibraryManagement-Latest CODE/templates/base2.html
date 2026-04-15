@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>LMS — Admin</title>
+
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #fdf8f0;
+      padding-top: 64px;
+    }
+
+    /* ══ NAVBAR ══ */
+    .lms-navbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 64px;
+      background: #ffffff;
+      border-bottom: 2px solid #e8d5a3;
+      display: flex;
+      align-items: center;
+      padding: 0 1.5rem;
+      z-index: 1030;
+      gap: 1rem;
+    }
+
+    /* Brand */
+    .lms-brand {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .lms-brand:hover { text-decoration: none; }
+    .lms-brand-icon {
+      width: 34px; height: 34px;
+      background: #b8860b;
+      border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .lms-brand-text  { font-size: 14px; font-weight: 600; color: #1a2a4a; letter-spacing: 0.02em; line-height: 1.2; }
+    .lms-brand-sub   { font-size: 10px; color: #b8860b; letter-spacing: 0.1em; text-transform: uppercase; }
+
+    /* Welcome pill — centre */
+    .lms-welcome-wrap {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+    }
+    .lms-welcome-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: #fdf3d8;
+      border: 0.5px solid #e8d5a3;
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      color: #7a5800;
+      white-space: nowrap;
+    }
+
+    /* Nav links — right */
+    .lms-nav-right {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      flex-shrink: 0;
+    }
+
+    .lms-nav-right .lms-link {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 7px 13px;
+      font-size: 13.5px;
+      color: #4a5568;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: background 0.14s, color 0.14s;
+      border: 0.5px solid transparent;
+      cursor: pointer;
+      background: none;
+      white-space: nowrap;
+    }
+    .lms-nav-right .lms-link:hover  { color: #1a2a4a; background: #f5edd8; text-decoration: none; }
+    .lms-nav-right .lms-link.active { color: #7a5800; background: #fdf3d8; border-color: #e8d5a3; font-weight: 500; }
+
+    /* Logout */
+    .lms-logout {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 7px 13px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #7a5800;
+      border: 1px solid #e8d5a3;
+      border-radius: 6px;
+      background: #fdf3d8;
+      text-decoration: none;
+      transition: background 0.14s;
+      margin-left: 6px;
+    }
+    .lms-logout:hover { background: #b8860b; color: #fff; border-color: #b8860b; text-decoration: none; }
+
+    .lms-nav-divider { width: 0.5px; height: 20px; background: #e0d5c0; margin: 0 4px; flex-shrink: 0; }
+
+    /* ══ DROPDOWN ══ */
+    .lms-dropdown { position: relative; }
+
+    .lms-dropdown-menu {
+      display: none;
+      position: absolute;
+      top: calc(100% + 6px);
+      right: 0;
+      background: #ffffff;
+      border: 0.5px solid #e8d5a3;
+      border-radius: 10px;
+      min-width: 210px;
+      padding: 6px;
+      z-index: 1040;
+      box-shadow: 0 4px 20px rgba(184,134,11,0.1);
+    }
+    .lms-dropdown-menu.open { display: block; }
+
+    .lms-dropdown-menu .lms-dd-header {
+      font-size: 10.5px;
+      font-weight: 600;
+      color: #b8860b;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 6px 10px 4px;
+    }
+
+    .lms-dropdown-menu a {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      font-size: 13px;
+      color: #3a4a5a;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: background 0.12s, color 0.12s;
+    }
+    .lms-dropdown-menu a:hover { background: #fdf3d8; color: #7a5800; text-decoration: none; }
+
+    .lms-dropdown-menu .lms-dd-divider {
+      border: none;
+      border-top: 0.5px solid #f0e8d0;
+      margin: 4px 0;
+    }
+
+    .lms-dd-icon {
+      width: 26px; height: 26px;
+      background: #f5edd8;
+      border-radius: 5px;
+      display: flex; align-items: center; justify-content: center;
+      color: #b8860b;
+      flex-shrink: 0;
+    }
+
+    /* ══ HAMBURGER (mobile) ══ */
+    .lms-toggler {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+      margin-left: auto;
+    }
+    .lms-toggler span { display: block; width: 22px; height: 2px; background: #4a5568; border-radius: 2px; }
+
+    /* ══ MOBILE DRAWER ══ */
+    .lms-drawer {
+      display: none;
+      position: fixed;
+      top: 64px; left: 0; right: 0; bottom: 0;
+      background: #fff;
+      z-index: 1025;
+      overflow-y: auto;
+      padding: 1rem 1.25rem 2rem;
+      border-top: 0.5px solid #e8d5a3;
+    }
+    .lms-drawer.open { display: block; }
+
+    .lms-drawer a {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      font-size: 14px;
+      color: #3a4a5a;
+      border-radius: 7px;
+      text-decoration: none;
+      transition: background 0.12s;
+    }
+    .lms-drawer a:hover { background: #fdf3d8; color: #7a5800; }
+
+    .lms-drawer .lms-drawer-section {
+      font-size: 10.5px;
+      font-weight: 600;
+      color: #b8860b;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 14px 12px 4px;
+    }
+    .lms-drawer hr { border: none; border-top: 0.5px solid #f0e8d0; margin: 6px 0; }
+
+    @media (max-width: 860px) {
+      .lms-nav-right, .lms-welcome-wrap { display: none; }
+      .lms-toggler { display: flex; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ NAVBAR ══ -->
+<nav class="lms-navbar">
+
+  <!-- Brand -->
+  <a href="{% url 'admindashboard' %}" class="lms-brand">
+    <div class="lms-brand-icon">
+      <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+        <rect x="3" y="3" width="5" height="7" rx="1" fill="#fff"/>
+        <rect x="9" y="3" width="5" height="7" rx="1" fill="#fff"/>
+        <rect x="3" y="12" width="11" height="2" rx="1" fill="#fff"/>
+        <rect x="3" y="15" width="8" height="2" rx="1" fill="rgba(255,255,255,0.5)"/>
+      </svg>
+    </div>
+    <div>
+      <div class="lms-brand-text">Library Management</div>
+      <div class="lms-brand-sub">Admin Panel</div>
+    </div>
+  </a>
+
+  <!-- Welcome pill -->
+  <div class="lms-welcome-wrap">
+    {% if user.is_authenticated %}
+    <div class="lms-welcome-pill">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <circle cx="7" cy="4.5" r="2.5" stroke="#b8860b" stroke-width="1.4"/>
+        <path d="M2 12c0-2.761 2.239-4 5-4s5 1.239 5 4" stroke="#b8860b" stroke-width="1.4" stroke-linecap="round"/>
+      </svg>
+      Welcome, {{ user.first_name }}!
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Right nav -->
+  <div class="lms-nav-right">
+
+    <!-- Home -->
+    <a href="{% url 'admindashboard' %}" class="lms-link active">
+      <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M1 7L7 1l6 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 5.5V12a.5.5 0 00.5.5h2.5V9h2v3.5H11a.5.5 0 00.5-.5V5.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Home
+    </a>
+
+    <div class="lms-nav-divider"></div>
+
+    <!-- Book dropdown -->
+    <div class="lms-dropdown" id="bookDropdown">
+      <button class="lms-link" onclick="toggleDropdown('bookMenu', 'bookDropdown')">
+        <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><rect x="2" y="1" width="10" height="12" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M4 4h6M4 7h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        Book
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 3.5l3 3 3-3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="lms-dropdown-menu" id="bookMenu">
+        <div class="lms-dd-header">Book Management</div>
+        <a href="{% url 'add_book' %}">
+          <span class="lms-dd-icon"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="1" width="10" height="10" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M6 3.5v5M3.5 6h5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></span>
+          Add Book
+        </a>
+        <a href="{% url 'view_books' %}">
+          <span class="lms-dd-icon"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="1" width="10" height="10" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M3 4h6M3 6h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></span>
+          View Books
+        </a>
+        <hr class="lms-dd-divider">
+        <div class="lms-dd-header">Circulation</div>
+        <a href="{% url 'issue_book' %}">
+          <span class="lms-dd-icon"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          Issue New Book
+        </a>
+        <a href="{% url 'view_issued_books' %}">
+          <span class="lms-dd-icon"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="1" width="10" height="10" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M3 6l2 2 4-4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          View Issued Books
+        </a>
+        <a href="{% url 'students_who_returned_books' %}">
+          <span class="lms-dd-icon"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M10 6H2M5 3L2 6l3 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          Returned Books
+        </a>
+        <a href="{% url 'view_book_requests' %}">
+          <span class="lms-dd-icon"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="currentColor" stroke-width="1.3"/><path d="M6 4v2.5M6 8v.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></span>
+          Book Requests
+        </a>
+        <a href="{% url 'view_sold_books' %}">
+          <span class="lms-dd-icon"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 2h1.5l1.8 5.5h3.4L10 4H4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="5" cy="10" r="1" fill="currentColor"/><circle cx="9" cy="10" r="1" fill="currentColor"/></svg></span>
+          Sold Books
+        </a>
+        <a href="{% url 'admin_orders' %}">
+          <span class="lms-dd-icon"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="1" width="10" height="10" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M3 4h6M3 6h4M3 8h3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></span>
+          Order Tracking
+        </a>
+      </div>
+    </div>
+
+    <!-- Student dropdown -->
+    <div class="lms-dropdown" id="studentDropdown">
+      <button class="lms-link" onclick="toggleDropdown('studentMenu', 'studentDropdown')">
+        <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="4.5" r="2.5" stroke="currentColor" stroke-width="1.4"/><path d="M2 12c0-2.761 2.239-4 5-4s5 1.239 5 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Student
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 3.5l3 3 3-3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="lms-dropdown-menu" id="studentMenu">
+        <div class="lms-dd-header">Student Management</div>
+        <a href="{% url 'list_students' %}">
+          <span class="lms-dd-icon"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="3.5" r="2" stroke="currentColor" stroke-width="1.3"/><path d="M1.5 10c0-2.5 2-3.5 4.5-3.5s4.5 1 4.5 3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></span>
+          View Students
+        </a>
+        <a href="{% url 'add_student' %}">
+          <span class="lms-dd-icon"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="5" cy="3.5" r="2" stroke="currentColor" stroke-width="1.3"/><path d="M1 10c0-2.5 1.8-3.5 4-3.5M8 7v4M10 9H6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></span>
+          Add Student
+        </a>
+        <hr class="lms-dd-divider">
+        <div class="lms-dd-header">Branch</div>
+        <a href="{% url 'list_branches' %}">
+          <span class="lms-dd-icon"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 9l5-7 5 7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 9h6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></span>
+          Manage Branches
+        </a>
+        <a href="{% url 'add_branch' %}">
+          <span class="lms-dd-icon"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="currentColor" stroke-width="1.3"/><path d="M6 4v4M4 6h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></span>
+          Add Branch
+        </a>
+      </div>
+    </div>
+
+    <div class="lms-nav-divider"></div>
+
+    <!-- Logout -->
+    <a href="{% url 'logout' %}" class="lms-logout">
+      <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M5 2H3a1 1 0 00-1 1v8a1 1 0 001 1h2M9 10l3-3-3-3M12 7H5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Logout
+    </a>
+  </div>
+
+  <!-- Hamburger -->
+  <button class="lms-toggler" id="lmsToggler">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- ══ MOBILE DRAWER ══ -->
+<div class="lms-drawer" id="lmsDrawer">
+  {% if user.is_authenticated %}
+  <div style="background:#fdf3d8;border:0.5px solid #e8d5a3;border-radius:8px;padding:10px 14px;margin-bottom:10px;font-family:'Fredoka',sans-serif;font-size:14px;font-weight:500;color:#7a5800;">
+    👋 Welcome, {{ user.first_name }}!
+  </div>
+  {% endif %}
+
+  <a href="{% url 'admindashboard' %}">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 7L7 1l6 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 5.5V12a.5.5 0 00.5.5h2.5V9h2v3.5H11a.5.5 0 00.5-.5V5.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Home
+  </a>
+  <hr>
+
+  <div class="lms-drawer-section">Book Management</div>
+  <a href="{% url 'add_book' %}">Add Book</a>
+  <a href="{% url 'view_books' %}">View Books</a>
+  <a href="{% url 'issue_book' %}">Issue New Book</a>
+  <a href="{% url 'view_issued_books' %}">View Issued Books</a>
+  <a href="{% url 'students_who_returned_books' %}">Returned Books</a>
+  <a href="{% url 'view_book_requests' %}">Book Requests</a>
+  <a href="{% url 'view_sold_books' %}">Sold Books</a>
+  <a href="{% url 'admin_orders' %}">Order Tracking</a>
+  <hr>
+
+  <div class="lms-drawer-section">Student Management</div>
+  <a href="{% url 'list_students' %}">View Students</a>
+  <a href="{% url 'add_student' %}">Add Student</a>
+  <hr>
+
+  <div class="lms-drawer-section">Branch</div>
+  <a href="{% url 'list_branches' %}">Manage Branches</a>
+  <a href="{% url 'add_branch' %}">Add Branch</a>
+  <hr>
+
+  <a href="{% url 'logout' %}" style="color:#b8860b;font-weight:500;">
+    <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M5 2H3a1 1 0 00-1 1v8a1 1 0 001 1h2M9 10l3-3-3-3M12 7H5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Logout
+  </a>
+</div>
+
+{% block content %}
+{% endblock %}
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+<script>
+  function toggleDropdown(menuId, wrapperId) {
+    const menu = document.getElementById(menuId);
+    const isOpen = menu.classList.contains('open');
+    // close all
+    document.querySelectorAll('.lms-dropdown-menu').forEach(m => m.classList.remove('open'));
+    document.querySelectorAll('.lms-dropdown').forEach(d => d.classList.remove('active'));
+    if (!isOpen) {
+      menu.classList.add('open');
+      document.getElementById(wrapperId).classList.add('active');
+    }
+  }
+
+  // Close dropdowns on outside click
+  document.addEventListener('click', function (e) {
+    if (!e.target.closest('.lms-dropdown')) {
+      document.querySelectorAll('.lms-dropdown-menu').forEach(m => m.classList.remove('open'));
+      document.querySelectorAll('.lms-dropdown').forEach(d => d.classList.remove('active'));
+    }
+  });
+
+  // Mobile drawer
+  document.getElementById('lmsToggler').addEventListener('click', function () {
+    document.getElementById('lmsDrawer').classList.toggle('open');
+  });
+</script>
+</body>
+</html>

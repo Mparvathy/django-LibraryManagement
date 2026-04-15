@@ -1,0 +1,324 @@
+{% extends 'base3.html' %}
+{% block content %}
+
+<style>
+  .checkout-wrap {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 0 1.25rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+  }
+
+  @media (max-width: 640px) { .checkout-wrap { grid-template-columns: 1fr; } }
+
+  .checkout-card {
+    background: #fff; border: 0.5px solid #e8d5a3;
+    border-radius: 12px; padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(184,134,11,0.07);
+  }
+
+  .card-heading {
+    font-size: 13px; font-weight: 600; color: #7a5800;
+    text-transform: uppercase; letter-spacing: 0.07em;
+    margin-bottom: 1rem; display: flex; align-items: center; gap: 7px;
+  }
+
+  hr.divider { border: none; border-top: 0.5px solid #f0e8d0; margin: 0.75rem 0 1rem; }
+
+  .lms-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .lms-table thead tr { background: #fdf3d8; }
+  .lms-table thead th { padding: 9px 12px; font-size: 11px; font-weight: 600; color: #7a5800; text-transform: uppercase; letter-spacing: 0.07em; text-align: left; }
+  .lms-table tbody tr { border-bottom: 0.5px solid #f0e8d0; }
+  .lms-table tbody tr:last-child { border-bottom: none; }
+  .lms-table tbody td { padding: 9px 12px; color: #3a4a5a; font-size: 13px; }
+  .lms-table tfoot tr { background: #fdf3d8; }
+  .lms-table tfoot td { padding: 9px 12px; font-size: 13px; font-weight: 700; color: #1a2a4a; }
+
+  /* Payment method tabs */
+  .pay-tabs { display: flex; gap: 8px; margin-bottom: 1rem; }
+  .pay-tab {
+    flex: 1; padding: 8px; border: 0.5px solid #ddd;
+    border-radius: 8px; text-align: center; cursor: pointer;
+    font-size: 12px; font-weight: 500; color: #4a5568;
+    background: #fdfaf5; transition: all 0.15s;
+  }
+  .pay-tab.active { border-color: #b8860b; background: #fdf3d8; color: #7a5800; }
+  .pay-tab:hover { border-color: #b8860b; }
+
+  .pay-section { display: none; }
+  .pay-section.active { display: block; }
+
+  /* Card UI */
+  .card-visual {
+    background: linear-gradient(135deg, #1a2a4a, #2d4a7a);
+    border-radius: 12px; padding: 1.25rem;
+    color: #fff; margin-bottom: 1rem;
+    position: relative; overflow: hidden;
+  }
+  .card-visual::before {
+    content: ''; position: absolute;
+    width: 150px; height: 150px; border-radius: 50%;
+    background: rgba(255,255,255,0.05);
+    top: -40px; right: -40px;
+  }
+  .card-chip {
+    width: 32px; height: 24px; background: #c8a84b;
+    border-radius: 4px; margin-bottom: 1rem;
+  }
+  .card-number-display {
+    font-size: 15px; letter-spacing: 3px;
+    font-family: monospace; margin-bottom: 0.75rem;
+    color: rgba(255,255,255,0.9);
+  }
+  .card-meta { display: flex; justify-content: space-between; font-size: 11px; color: rgba(255,255,255,0.7); }
+  .card-meta span { display: block; font-size: 13px; color: #fff; font-weight: 500; }
+
+  .lms-field { margin-bottom: 0.85rem; }
+  .lms-field label { display: block; font-size: 12px; font-weight: 500; color: #4a5568; margin-bottom: 4px; }
+  .lms-field input, .lms-field select {
+    width: 100%; height: 38px;
+    border: 0.5px solid #ddd; border-radius: 7px;
+    padding: 0 11px; font-size: 13px; color: #1a2a4a;
+    background: #fdfaf5; outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .lms-field input:focus, .lms-field select:focus {
+    border-color: #c8a84b;
+    box-shadow: 0 0 0 3px rgba(200,168,75,0.12);
+    background: #fff;
+  }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+  /* UPI section */
+  .upi-logo { font-size: 1.5rem; font-weight: 700; color: #1a2a4a; text-align: center; margin-bottom: 0.75rem; }
+  .upi-info { background: #fdf3d8; border: 0.5px solid #e8d5a3; border-radius: 8px; padding: 10px 14px; font-size: 12.5px; color: #7a5800; margin-bottom: 1rem; }
+
+  /* Net banking */
+  .bank-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 1rem; }
+  .bank-option {
+    border: 0.5px solid #ddd; border-radius: 8px;
+    padding: 10px; text-align: center; cursor: pointer;
+    font-size: 12px; font-weight: 500; color: #3a4a5a;
+    transition: all 0.15s;
+  }
+  .bank-option:hover, .bank-option.selected { border-color: #b8860b; background: #fdf3d8; color: #7a5800; }
+
+  .lms-submit-btn {
+    width: 100%; height: 42px; background: #1a2a4a;
+    color: #fff; border: none; border-radius: 8px;
+    font-size: 14px; font-weight: 500; cursor: pointer;
+    margin-top: 0.75rem; transition: background 0.15s;
+    display: flex; align-items: center; justify-content: center; gap: 7px;
+  }
+  .lms-submit-btn:hover { background: #b8860b; }
+
+  .secure-badge {
+    display: flex; align-items: center; justify-content: center;
+    gap: 5px; font-size: 11.5px; color: #9a8060; margin-top: 0.75rem;
+  }
+
+  /* Processing overlay */
+  #processingOverlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5); z-index: 9999;
+    align-items: center; justify-content: center;
+  }
+  .processing-card {
+    background: #fff; border-radius: 14px;
+    padding: 2.5rem 2rem; text-align: center;
+    max-width: 320px; width: 90%;
+  }
+  .spinner {
+    width: 48px; height: 48px; border: 3px solid #f0e8d0;
+    border-top-color: #b8860b; border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 1rem;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .processing-card h3 { font-size: 1rem; font-weight: 600; color: #1a2a4a; margin-bottom: 0.4rem; }
+  .processing-card p  { font-size: 12.5px; color: #7a8a9a; }
+</style>
+
+<!-- Processing overlay -->
+<div id="processingOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center;">
+  <div class="processing-card">
+    <div class="spinner"></div>
+    <h3>Processing Payment...</h3>
+    <p>Please do not close this window</p>
+  </div>
+</div>
+
+<div class="checkout-wrap">
+
+  <!-- Left: Order Summary -->
+  <div class="checkout-card">
+    <div class="card-heading">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="1" width="10" height="12" rx="1.5" stroke="#b8860b" stroke-width="1.4"/><path d="M4 4h6M4 7h4" stroke="#b8860b" stroke-width="1.2" stroke-linecap="round"/></svg>
+      Order Summary
+    </div>
+    <hr class="divider">
+    <table class="lms-table">
+      <thead>
+        <tr><th>Book</th><th>Qty</th><th>Price</th></tr>
+      </thead>
+      <tbody>
+        {% for item in cart.items.all %}
+        <tr>
+          <td>{{ item.book.name }}</td>
+          <td>{{ item.quantity }}</td>
+          <td>₹{{ item.book.price }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr><td colspan="2">Total</td><td>₹{{ total_price }}</td></tr>
+      </tfoot>
+    </table>
+
+    <div style="margin-top:1rem;background:#fdf3d8;border:0.5px solid #e8d5a3;border-radius:8px;padding:10px 14px;">
+      <div style="font-size:11px;font-weight:600;color:#9a8060;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:4px;">Delivery Address</div>
+      <div style="font-size:13px;color:#1a2a4a;" id="addressPreview">—</div>
+    </div>
+  </div>
+
+  <!-- Right: Payment -->
+  <div class="checkout-card">
+    <div class="card-heading">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="3" width="12" height="9" rx="1.5" stroke="#b8860b" stroke-width="1.4"/><path d="M1 6h12" stroke="#b8860b" stroke-width="1.3"/><path d="M4 9.5h2" stroke="#b8860b" stroke-width="1.3" stroke-linecap="round"/></svg>
+      Payment
+    </div>
+    <hr class="divider">
+
+    <form method="post" id="checkoutForm">
+      {% csrf_token %}
+      <input type="hidden" name="address" id="addressHidden">
+      <input type="hidden" name="account_number" id="accountHidden">
+      <input type="hidden" name="cvv" id="cvvHidden">
+
+      <!-- Address -->
+      <div class="lms-field">
+        <label>Delivery Address</label>
+        <input type="text" id="addressInput" placeholder="Enter delivery address" required oninput="document.getElementById('addressPreview').textContent=this.value||'—';document.getElementById('addressHidden').value=this.value;">
+      </div>
+
+      <!-- Payment tabs -->
+      <div class="pay-tabs">
+        <div class="pay-tab active" onclick="switchTab('card')">💳 Card</div>
+        <div class="pay-tab" onclick="switchTab('upi')">📱 UPI</div>
+        <div class="pay-tab" onclick="switchTab('netbanking')">🏦 Net Banking</div>
+      </div>
+
+      <!-- Card section -->
+      <div class="pay-section active" id="tab-card">
+        <div class="card-visual">
+          <div class="card-chip"></div>
+          <div class="card-number-display" id="cardDisplay">•••• •••• •••• ••••</div>
+          <div class="card-meta">
+            <div>Card Holder<span id="holderDisplay">YOUR NAME</span></div>
+            <div>Expires<span id="expiryDisplay">MM/YY</span></div>
+          </div>
+        </div>
+        <div class="lms-field">
+          <label>Card Number</label>
+          <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19"
+            oninput="formatCard(this)" onchange="document.getElementById('accountHidden').value=this.value.replace(/\s/g,'');">
+        </div>
+        <div class="lms-field">
+          <label>Card Holder Name</label>
+          <input type="text" id="holderName" placeholder="Name on card"
+            oninput="document.getElementById('holderDisplay').textContent=this.value.toUpperCase()||'YOUR NAME'">
+        </div>
+        <div class="field-row">
+          <div class="lms-field">
+            <label>Expiry Date</label>
+            <input type="text" placeholder="MM/YY" maxlength="5"
+              oninput="formatExpiry(this);document.getElementById('expiryDisplay').textContent=this.value||'MM/YY'">
+          </div>
+          <div class="lms-field">
+            <label>CVV</label>
+            <input type="password" id="cvvInput" placeholder="•••" maxlength="4"
+              oninput="document.getElementById('cvvHidden').value=this.value;">
+          </div>
+        </div>
+      </div>
+
+      <!-- UPI section -->
+      <div class="pay-section" id="tab-upi">
+        <div class="upi-logo">UPI</div>
+        <div class="upi-info">💡 Enter your UPI ID to complete the payment instantly.</div>
+        <div class="lms-field">
+          <label>UPI ID</label>
+          <input type="text" placeholder="yourname@upi"
+            oninput="document.getElementById('accountHidden').value=this.value;document.getElementById('cvvHidden').value='UPI';">
+        </div>
+      </div>
+
+      <!-- Net Banking section -->
+      <div class="pay-section" id="tab-netbanking">
+        <div class="lms-field" style="margin-bottom:0.5rem;"><label>Select Bank</label></div>
+        <div class="bank-grid">
+          <div class="bank-option" onclick="selectBank(this, 'SBI')">SBI</div>
+          <div class="bank-option" onclick="selectBank(this, 'HDFC')">HDFC</div>
+          <div class="bank-option" onclick="selectBank(this, 'ICICI')">ICICI</div>
+          <div class="bank-option" onclick="selectBank(this, 'Axis')">Axis</div>
+          <div class="bank-option" onclick="selectBank(this, 'Kotak')">Kotak</div>
+          <div class="bank-option" onclick="selectBank(this, 'PNB')">PNB</div>
+        </div>
+        <div class="lms-field">
+          <label>Net Banking Password</label>
+          <input type="password" placeholder="Enter password"
+            oninput="document.getElementById('cvvHidden').value=this.value;">
+        </div>
+      </div>
+
+      <button type="submit" class="lms-submit-btn" onclick="showProcessing()">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M8 4l4 3-4 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Pay ₹{{ total_price }}
+      </button>
+
+      <div class="secure-badge">
+        <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M7 1L2 3.5v4C2 10.5 4.5 13 7 13s5-2.5 5-5.5v-4L7 1z" stroke="#9a8060" stroke-width="1.3"/></svg>
+        Secured & Encrypted Payment
+      </div>
+    </form>
+  </div>
+
+</div>
+
+<script>
+  function switchTab(tab) {
+    document.querySelectorAll('.pay-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.pay-section').forEach(s => s.classList.remove('active'));
+    document.getElementById('tab-' + tab).classList.add('active');
+    event.target.classList.add('active');
+  }
+
+  function formatCard(input) {
+    let v = input.value.replace(/\D/g, '').substring(0, 16);
+    input.value = v.replace(/(.{4})/g, '$1 ').trim();
+    document.getElementById('cardDisplay').textContent = (v + '................').substring(0, 16).replace(/(.{4})/g, '$1 ').trim().replace(/\d/g, (c, i) => i < 12 ? '•' : c) || '•••• •••• •••• ••••';
+    document.getElementById('accountHidden').value = v;
+  }
+
+  function formatExpiry(input) {
+    let v = input.value.replace(/\D/g, '');
+    if (v.length >= 2) v = v.substring(0,2) + '/' + v.substring(2,4);
+    input.value = v;
+  }
+
+  function selectBank(el, bank) {
+    document.querySelectorAll('.bank-option').forEach(b => b.classList.remove('selected'));
+    el.classList.add('selected');
+    document.getElementById('accountHidden').value = bank;
+  }
+
+  function showProcessing() {
+    setTimeout(function() {
+      document.getElementById('processingOverlay').style.display = 'flex';
+    }, 100);
+  }
+</script>
+
+{% endblock %}

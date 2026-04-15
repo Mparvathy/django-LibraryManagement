@@ -1,0 +1,171 @@
+{% extends 'base2.html' %}
+
+{% block content %}
+
+<!-- Toast container -->
+<div class="lms-toast-container" id="lmsToastContainer" style="position:fixed;top:80px;right:1.5rem;z-index:9999;display:flex;flex-direction:column;gap:10px;">
+  {% for message in messages %}
+  <div class="lms-toast {% if 'error' in message.tags %}lms-toast-error{% elif 'success' in message.tags %}lms-toast-success{% endif %}" role="alert" style="background:#fff;border:0.5px solid #e8d5a3;border-left:4px solid #1d9e75;border-radius:8px;padding:12px 42px 12px 14px;min-width:280px;max-width:360px;position:relative;animation:lms-slide-in 0.25s ease;">
+    <div style="font-size:13px;font-weight:600;color:#1a2a4a;margin-bottom:2px;">Success</div>
+    <div style="font-size:12.5px;color:#5a6a82;">{{ message }}</div>
+    <button onclick="this.closest('.lms-toast').remove()" style="position:absolute;top:8px;right:10px;background:none;border:none;font-size:16px;color:#aaa;cursor:pointer;">&times;</button>
+  </div>
+  {% endfor %}
+</div>
+
+<style>
+@keyframes lms-slide-in { from { opacity:0; transform:translateX(30px); } to { opacity:1; transform:translateX(0); } }
+@keyframes lms-fade-out  { from { opacity:1; } to { opacity:0; transform:translateX(30px); } }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.lms-toast').forEach(function (toast) {
+      setTimeout(function () {
+        toast.style.animation = 'lms-fade-out 0.3s ease forwards';
+        setTimeout(function () { toast.remove(); }, 300);
+      }, 4000);
+    });
+  });
+</script>
+
+<style>
+  .dash-wrap {
+    max-width: 1100px;
+    margin: 2rem auto;
+    padding: 0 1.25rem;
+  }
+
+  .dash-heading {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #7a5800;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .dash-heading span {
+    display: inline-block;
+    width: 4px;
+    height: 18px;
+    background: #b8860b;
+    border-radius: 3px;
+  }
+
+  .dash-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.25rem;
+  }
+
+  .dash-card {
+    background: #ffffff;
+    border: 0.5px solid #e8d5a3;
+    border-radius: 12px;
+    padding: 1.4rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    box-shadow: 0 2px 8px rgba(184,134,11,0.07);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .dash-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 18px rgba(184,134,11,0.13);
+  }
+
+  .dash-card-icon {
+    width: 42px; height: 42px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem;
+  }
+
+  .icon-blue   { background: #e8f0fe; color: #1a73e8; }
+  .icon-green  { background: #e6f4ea; color: #1e8e3e; }
+  .icon-yellow { background: #fef7e0; color: #b8860b; }
+  .icon-red    { background: #fce8e6; color: #d93025; }
+  .icon-teal   { background: #e6f7f5; color: #0d9488; }
+
+  .dash-card-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #9a8060;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+  }
+
+  .dash-card-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1a2a4a;
+    line-height: 1;
+  }
+
+  /* messages */
+  .dash-messages {
+    margin-bottom: 1.25rem;
+  }
+  .dash-alert {
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 13.5px;
+    border: 0.5px solid transparent;
+  }
+  .dash-alert.success { background: #e6f4ea; border-color: #a8d5b5; color: #1e6e34; }
+  .dash-alert.error   { background: #fce8e6; border-color: #f5b8b4; color: #c0392b; }
+</style>
+
+<div class="dash-wrap">
+  <div class="dash-heading">
+    <span></span> Dashboard Overview
+  </div>
+
+  <div class="dash-grid">
+
+    <div class="dash-card">
+      <div class="dash-card-icon icon-blue">
+        <i class="fa fa-users"></i>
+      </div>
+      <div class="dash-card-label">Total Students</div>
+      <div class="dash-card-value">{{ studentcount }}</div>
+    </div>
+
+    <div class="dash-card">
+      <div class="dash-card-icon icon-green">
+        <i class="fa fa-book"></i>
+      </div>
+      <div class="dash-card-label">Total Books</div>
+      <div class="dash-card-value">{{ totalbooks }}</div>
+    </div>
+
+    <div class="dash-card">
+      <div class="dash-card-icon icon-yellow">
+        <i class="fa fa-arrow-right"></i>
+      </div>
+      <div class="dash-card-label">Issued Books</div>
+      <div class="dash-card-value">{{ issuedbooks }}</div>
+    </div>
+
+    <div class="dash-card">
+      <div class="dash-card-icon icon-teal">
+        <i class="fa fa-arrow-left"></i>
+      </div>
+      <div class="dash-card-label">Returned Books</div>
+      <div class="dash-card-value">{{ returnedbooks }}</div>
+    </div>
+
+    <div class="dash-card">
+      <div class="dash-card-icon icon-red">
+        <i class="fa fa-clock-o"></i>
+      </div>
+      <div class="dash-card-label">Pending Requests</div>
+      <div class="dash-card-value">{{ pendingrequests }}</div>
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}

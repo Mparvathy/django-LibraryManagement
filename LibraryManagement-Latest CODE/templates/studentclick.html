@@ -1,0 +1,204 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<style>
+  body {
+    background: #fdf8f0;
+    font-family: 'Segoe UI', sans-serif;
+  }
+
+  .lms-admin-hero {
+    min-height: calc(100vh - 64px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1rem;
+    background:
+      radial-gradient(ellipse at 20% 50%, rgba(200,168,75,0.07) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 20%, rgba(26,42,74,0.05) 0%, transparent 60%),
+      #fdf8f0;
+  }
+
+  .lms-admin-inner {
+    text-align: center;
+    max-width: 580px;
+    width: 100%;
+  }
+
+  .lms-admin-badge {
+    width: 72px; height: 72px;
+    background: #fdf3d8;
+    border: 1.5px solid #e8d5a3;
+    border-radius: 18px;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 1.5rem;
+  }
+
+  .lms-admin-tag {
+    display: inline-block;
+    background: #fdf3d8;
+    border: 0.5px solid #e8d5a3;
+    color: #7a5800;
+    font-size: 11.5px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border-radius: 20px;
+    padding: 4px 14px;
+    margin-bottom: 1.1rem;
+  }
+
+  .lms-admin-inner h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1a2a4a;
+    margin-bottom: 1rem;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+  }
+
+  .lms-admin-inner h1 span { color: #b8860b; }
+
+  .lms-admin-desc {
+    font-size: 1rem;
+    color: #5a6a82;
+    line-height: 1.75;
+    margin-bottom: 0.75rem;
+  }
+
+  .lms-admin-sub {
+    font-size: 0.875rem;
+    color: #9aabb8;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+  }
+
+  .lms-hr { border: none; border-top: 0.5px solid #e8d5a3; margin: 1.75rem 0; }
+
+  .lms-features {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+  }
+
+  .lms-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #fff;
+    border: 0.5px solid #e8d5a3;
+    border-radius: 20px;
+    padding: 5px 13px;
+    font-size: 12.5px;
+    color: #4a5568;
+  }
+
+  .lms-chip svg { color: #b8860b; flex-shrink: 0; }
+
+  .lms-btn-group {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .lms-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 11px 28px;
+    background: #1a2a4a;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background 0.15s;
+  }
+  .lms-btn-primary:hover { background: #b8860b; color: #fff; text-decoration: none; }
+
+  .lms-btn-outline {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 10px 28px;
+    background: #fdf3d8;
+    color: #7a5800;
+    border: 1.5px solid #e8d5a3;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .lms-btn-outline:hover { background: #f5e8b8; border-color: #c8a84b; color: #7a5800; text-decoration: none; }
+
+  @media (max-width: 480px) {
+    .lms-admin-inner h1 { font-size: 1.5rem; }
+    .lms-btn-group { flex-direction: column; align-items: center; }
+    .lms-btn-primary, .lms-btn-outline { width: 100%; justify-content: center; }
+  }
+</style>
+
+<div class="lms-admin-hero">
+  <div class="lms-admin-inner">
+
+    <div class="lms-admin-badge">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+        <circle cx="16" cy="10" r="6" stroke="#b8860b" stroke-width="1.8"/>
+        <path d="M5 28c0-6.075 4.925-10 11-10s11 3.925 11 10" stroke="#b8860b" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <div class="lms-admin-tag">Student Portal</div>
+
+    <h1>Hello, <span>Student</span> 👋</h1>
+
+    <p class="lms-admin-desc">
+      Welcome to the <strong>Online Library Management System.</strong><br>
+      Browse books, request issues, track due dates and manage your reading — all in one place.
+    </p>
+    <p class="lms-admin-sub">
+      You can access all features after signing in. New here? Create an account to get started.
+    </p>
+
+    <hr class="lms-hr">
+
+    <div class="lms-features">
+      <div class="lms-chip">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1" y="1" width="11" height="11" rx="2" stroke="currentColor" stroke-width="1.3"/><path d="M4 6.5h5M4 4.5h3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        Browse Books
+      </div>
+      <div class="lms-chip">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6h9M7 3l4 3-4 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Request Issue
+      </div>
+      <div class="lms-chip">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.3"/><path d="M6.5 4v2.5l1.5 1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        Track Due Dates
+      </div>
+      <div class="lms-chip">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M10 6H2M5 3L2 6l3 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Return Books
+      </div>
+    </div>
+
+    <div class="lms-btn-group">
+      <a href="{% url 'studentsignup' %}" class="lms-btn-outline">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="4.5" r="2.5" stroke="currentColor" stroke-width="1.4"/><path d="M2 12c0-2.761 2.239-4 5-4s5 1.239 5 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M11 1v4M9 3h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        Sign Up
+      </a>
+      <a href="{% url 'studentlogin' %}" class="lms-btn-primary">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="5" width="8" height="7" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M4 5V3.5a3 3 0 016 0V5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="6" cy="8.5" r="1" fill="currentColor"/></svg>
+        Login
+      </a>
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}

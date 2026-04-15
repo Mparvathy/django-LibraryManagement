@@ -1,0 +1,129 @@
+{% extends 'base3.html' %}
+{% load static %}
+{% block content %}
+
+<style>
+  .profile-wrap {
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 0 1.25rem;
+  }
+
+  .profile-card {
+    background: #fff;
+    border: 0.5px solid #e8d5a3;
+    border-radius: 14px;
+    padding: 2rem;
+    box-shadow: 0 2px 12px rgba(184,134,11,0.08);
+  }
+
+  .profile-top {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .profile-avatar {
+    width: 90px; height: 90px;
+    border-radius: 50%;
+    border: 3px solid #e8d5a3;
+    object-fit: cover;
+    background: #fdf3d8;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2rem; font-weight: 700; color: #b8860b;
+    overflow: hidden;
+    margin-bottom: 0.75rem;
+  }
+
+  .profile-name {
+    font-size: 1.1rem; font-weight: 600; color: #1a2a4a;
+    margin-bottom: 0.2rem;
+  }
+
+  .profile-tag {
+    display: inline-block;
+    background: #fdf3d8; border: 0.5px solid #e8d5a3;
+    color: #7a5800; font-size: 11.5px; font-weight: 500;
+    border-radius: 20px; padding: 3px 12px;
+  }
+
+  hr.divider { border: none; border-top: 0.5px solid #f0e8d0; margin: 1.25rem 0; }
+
+  .profile-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .profile-field label {
+    display: block;
+    font-size: 11px; font-weight: 600; color: #9a8060;
+    text-transform: uppercase; letter-spacing: 0.07em;
+    margin-bottom: 3px;
+  }
+
+  .profile-field span {
+    font-size: 13.5px; color: #1a2a4a; font-weight: 500;
+  }
+
+  @media (max-width: 480px) {
+    .profile-grid { grid-template-columns: 1fr; }
+  }
+</style>
+
+<div class="profile-wrap">
+  <div class="profile-card">
+
+    <div class="profile-top">
+      <div class="profile-avatar">
+        {% if user.profile_pic %}
+          <img src="{{ user.profile_pic.url }}" alt="Profile" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
+        {% else %}
+          {{ user.first_name|first|upper }}
+        {% endif %}
+      </div>
+      <div class="profile-name">{{ user.first_name }}</div>
+      <div class="profile-tag">Student</div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="profile-grid">
+      <div class="profile-field">
+        <label>Username</label>
+        <span>{{ user.username }}</span>
+      </div>
+      <div class="profile-field">
+        <label>Email</label>
+        <span>{{ user.email }}</span>
+      </div>
+      <div class="profile-field">
+        <label>Full Name</label>
+        <span>{{ user.first_name|default:"—" }}</span>
+      </div>
+      <div class="profile-field">
+        <label>Phone</label>
+        <span>{{ user.phone|default:"—" }}</span>
+      </div>
+      <div class="profile-field">
+        <label>Enrollment</label>
+        <span>{{ user.enrollment|default:"—" }}</span>
+      </div>
+      <div class="profile-field">
+        <label>Branch</label>
+        <span>{{ user.branch|default:"—" }}</span>
+      </div>
+    </div>
+
+    <div style="margin-top:1.5rem;text-align:center;">
+      <a href="{% url 'edit_profile' %}" style="display:inline-flex;align-items:center;gap:6px;padding:9px 22px;background:#1a2a4a;color:#fff;border-radius:8px;font-size:13.5px;font-weight:500;text-decoration:none;transition:background 0.15s;" onmouseover="this.style.background='#b8860b'" onmouseout="this.style.background='#1a2a4a'">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        Edit Profile
+      </a>
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}

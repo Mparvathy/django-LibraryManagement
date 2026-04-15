@@ -1,0 +1,73 @@
+{% extends 'base2.html' %}
+{% block content %}
+
+<style>
+  .page-wrap { max-width: 1100px; margin: 2rem auto; padding: 0 1.25rem; }
+
+  .page-heading { font-size: 1.1rem; font-weight: 600; color: #7a5800; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 8px; }
+  .page-heading span { display: inline-block; width: 4px; height: 18px; background: #b8860b; border-radius: 3px; }
+
+  .lms-table-wrap { background: #fff; border: 0.5px solid #e8d5a3; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(184,134,11,0.07); }
+
+  .lms-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .lms-table thead tr { background: #fdf3d8; border-bottom: 1px solid #e8d5a3; }
+  .lms-table thead th { padding: 11px 14px; font-size: 11.5px; font-weight: 600; color: #7a5800; text-transform: uppercase; letter-spacing: 0.07em; text-align: left; white-space: nowrap; }
+  .lms-table tbody tr { border-bottom: 0.5px solid #f0e8d0; transition: background 0.12s; }
+  .lms-table tbody tr:last-child { border-bottom: none; }
+  .lms-table tbody tr:hover { background: #fffdf7; }
+  .lms-table tbody td { padding: 10px 14px; color: #3a4a5a; vertical-align: middle; }
+
+  .lms-table tbody td img { width: 48px; height: 60px; object-fit: cover; border-radius: 5px; border: 0.5px solid #e8d5a3; }
+
+  .buyer-pill { display: inline-flex; align-items: center; gap: 6px; background: #fdf3d8; border: 0.5px solid #e8d5a3; border-radius: 20px; padding: 3px 10px; font-size: 12px; color: #7a5800; font-weight: 500; }
+
+  .empty-state { text-align: center; padding: 3rem 1rem; color: #9a8060; font-size: 14px; }
+</style>
+
+<div class="page-wrap">
+  <div class="page-heading">
+    <span></span> Sold Books
+  </div>
+
+  <div class="lms-table-wrap">
+    <table class="lms-table">
+      <thead>
+        <tr>
+          <th>Cover</th>
+          <th>Book Title</th>
+          <th>Author</th>
+          <th>Category</th>
+          <th>Price</th>
+          <th>Purchased By</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for book in sold_books %}
+        <tr>
+          <td>
+            {% if book.cover %}
+              <img src="{{ book.cover.url }}" alt="{{ book.name }}">
+            {% else %}
+              <span style="color:#b0bac8;font-size:12px;">No image</span>
+            {% endif %}
+          </td>
+          <td>{{ book.name }}</td>
+          <td>{{ book.author }}</td>
+          <td>{{ book.category }}</td>
+          <td>₹{{ book.price }}</td>
+          <td>
+            <span class="buyer-pill">
+              <svg width="11" height="11" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="4.5" r="2.5" stroke="#b8860b" stroke-width="1.4"/><path d="M2 12c0-2.761 2.239-4 5-4s5 1.239 5 4" stroke="#b8860b" stroke-width="1.4" stroke-linecap="round"/></svg>
+              {{ book.sold_to.first_name }} ({{ book.sold_to.username }})
+            </span>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" class="empty-state">No books have been sold yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

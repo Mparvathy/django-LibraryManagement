@@ -1,0 +1,179 @@
+{% extends 'base3.html' %}
+{% block content %}
+
+<style>
+  .receipt-wrap {
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 0 1.25rem;
+  }
+
+  .receipt-card {
+    background: #fff;
+    border: 0.5px solid #e8d5a3;
+    border-radius: 14px;
+    padding: 2rem;
+    box-shadow: 0 2px 12px rgba(184,134,11,0.08);
+  }
+
+  .receipt-top {
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .success-icon {
+    width: 60px; height: 60px;
+    background: #e6f4ea; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 0.75rem;
+  }
+
+  .receipt-top h2 { font-size: 1.1rem; font-weight: 700; color: #1a2a4a; margin-bottom: 0.25rem; }
+  .receipt-top p  { font-size: 12.5px; color: #7a8a9a; margin: 0; }
+
+  .txn-id {
+    display: inline-block;
+    background: #fdf3d8; border: 0.5px solid #e8d5a3;
+    border-radius: 20px; padding: 3px 14px;
+    font-size: 12px; font-weight: 600; color: #7a5800;
+    margin-top: 0.5rem; font-family: monospace;
+  }
+
+  hr.divider { border: none; border-top: 0.5px solid #f0e8d0; margin: 1.25rem 0; }
+
+  .receipt-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .receipt-field label {
+    display: block; font-size: 11px; font-weight: 600;
+    color: #9a8060; text-transform: uppercase;
+    letter-spacing: 0.07em; margin-bottom: 3px;
+  }
+  .receipt-field span { font-size: 13px; color: #1a2a4a; font-weight: 500; }
+
+  .lms-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .lms-table thead tr { background: #fdf3d8; }
+  .lms-table thead th { padding: 9px 12px; font-size: 11px; font-weight: 600; color: #7a5800; text-transform: uppercase; letter-spacing: 0.07em; text-align: left; }
+  .lms-table tbody tr { border-bottom: 0.5px solid #f0e8d0; }
+  .lms-table tbody tr:last-child { border-bottom: none; }
+  .lms-table tbody td { padding: 9px 12px; color: #3a4a5a; }
+  .lms-table tfoot tr { background: #fdf3d8; }
+  .lms-table tfoot td { padding: 9px 12px; font-size: 13px; font-weight: 700; color: #1a2a4a; }
+
+  .btn-row { display: flex; gap: 8px; margin-top: 1.25rem; }
+
+  .btn-download {
+    flex: 1; height: 40px; background: #1a2a4a; color: #fff;
+    border: none; border-radius: 8px; font-size: 13.5px; font-weight: 500;
+    text-decoration: none; display: flex; align-items: center;
+    justify-content: center; gap: 6px; transition: background 0.15s;
+  }
+  .btn-download:hover { background: #b8860b; color: #fff; text-decoration: none; }
+
+  .btn-dashboard {
+    flex: 1; height: 40px; background: #fdf3d8; color: #7a5800;
+    border: 0.5px solid #e8d5a3; border-radius: 8px;
+    font-size: 13.5px; font-weight: 500; text-decoration: none;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    transition: background 0.15s;
+  }
+  .btn-dashboard:hover { background: #b8860b; color: #fff; text-decoration: none; }
+
+  .delivery-badge {
+    background: #e8f0fe; border: 0.5px solid #c5d8f8;
+    border-radius: 8px; padding: 10px 14px;
+    font-size: 12.5px; color: #1a73e8;
+    display: flex; align-items: center; gap: 8px;
+    margin-top: 1rem;
+  }
+</style>
+
+<div class="receipt-wrap">
+  <div class="receipt-card">
+
+    <div class="receipt-top">
+      <div class="success-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="10" stroke="#1e8e3e" stroke-width="1.6"/>
+          <path d="M7 12l3.5 3.5L17 8" stroke="#1e8e3e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h2>Payment Successful!</h2>
+      <p>Your order has been placed successfully.</p>
+      <div class="txn-id">TXN#{{ order.id }}{{ order.created_at|date:"dmYHi" }}</div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="receipt-grid">
+      <div class="receipt-field">
+        <label>Order ID</label>
+        <span>#{{ order.id }}</span>
+      </div>
+      <div class="receipt-field">
+        <label>Order Date</label>
+        <span>{{ order.created_at|date:"d M Y, H:i" }}</span>
+      </div>
+      <div class="receipt-field">
+        <label>Payment Method</label>
+        <span>{{ order.account_number|truncatechars:20 }}</span>
+      </div>
+      <div class="receipt-field">
+        <label>Amount Paid</label>
+        <span style="color:#1e8e3e;font-weight:700;">₹{{ order.total_price }}</span>
+      </div>
+      <div class="receipt-field" style="grid-column:1/-1;">
+        <label>Delivery Address</label>
+        <span>{{ order.address }}</span>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <div style="font-size:12px;font-weight:600;color:#7a5800;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:0.75rem;">Purchased Books</div>
+
+    <div style="background:#fff;border:0.5px solid #e8d5a3;border-radius:8px;overflow:hidden;">
+      <table class="lms-table">
+        <thead>
+          <tr><th>Book</th><th>Price</th></tr>
+        </thead>
+        <tbody>
+          {% for item in order.user.purchased_books.all %}
+          <tr>
+            <td>{{ item.name }}</td>
+            <td>₹{{ item.price }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="2" style="text-align:center;color:#9a8060;padding:1rem;">Books purchased in this order</td></tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr><td>Total</td><td>₹{{ order.total_price }}</td></tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <div class="delivery-badge">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="1" y="3" width="15" height="13" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M16 8h4l3 5v4h-7V8z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="5.5" cy="18.5" r="2" stroke="currentColor" stroke-width="1.5"/><circle cx="18.5" cy="18.5" r="2" stroke="currentColor" stroke-width="1.5"/></svg>
+      Estimated delivery: {{ order.created_at|date:"d M Y"|add:" + 14 days" }} &nbsp;|&nbsp; 📦 Processing your order
+    </div>
+
+    <div class="btn-row">
+      <a href="{% url 'download_transaction_details' order.id %}" class="btn-download">
+        <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M7 1v8M4 6l3 3 3-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 11h10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Download Receipt
+      </a>
+      <a href="{% url 'studentdashboard' %}" class="btn-dashboard">
+        <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M1 7L7 1l6 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 5.5V12a.5.5 0 00.5.5h2.5V9h2v3.5H11a.5.5 0 00.5-.5V5.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Dashboard
+      </a>
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}

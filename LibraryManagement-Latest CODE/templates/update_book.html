@@ -1,0 +1,230 @@
+{% extends 'base2.html' %}
+{% block content %}
+
+<!-- Toast -->
+<div style="position:fixed;top:80px;right:1.5rem;z-index:9999;display:flex;flex-direction:column;gap:10px;">
+  {% for message in messages %}
+  <div class="lms-ub-toast {% if 'error' in message.tags %}toast-error{% else %}toast-success{% endif %}">
+    <div style="font-size:13px;font-weight:600;color:#1a2a4a;margin-bottom:2px;">{% if 'error' in message.tags %}Error{% else %}Success{% endif %}</div>
+    <div style="font-size:12.5px;color:#5a6a82;">{{ message }}</div>
+    <button onclick="this.closest('.lms-ub-toast').remove()" style="position:absolute;top:8px;right:10px;background:none;border:none;font-size:16px;color:#aaa;cursor:pointer;">&times;</button>
+  </div>
+  {% endfor %}
+</div>
+
+<style>
+  @keyframes lms-slide-in { from { opacity:0; transform:translateX(30px); } to { opacity:1; transform:translateX(0); } }
+  @keyframes lms-fade-out  { from { opacity:1; } to { opacity:0; transform:translateX(30px); } }
+
+  .lms-ub-toast {
+    background: #fff;
+    border: 0.5px solid #e8d5a3;
+    border-radius: 8px;
+    padding: 12px 42px 12px 14px;
+    min-width: 280px;
+    max-width: 360px;
+    position: relative;
+    animation: lms-slide-in 0.25s ease;
+  }
+  .toast-success { border-left: 4px solid #1d9e75; }
+  .toast-error   { border-left: 4px solid #e24b4a; }
+
+  .add-book-wrap {
+    min-height: calc(100vh - 64px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    background: #fdf8f0;
+  }
+
+  .add-book-card {
+    background: #ffffff;
+    border: 0.5px solid #e8d5a3;
+    border-radius: 14px;
+    width: 100%;
+    max-width: 420px;
+    padding: 2rem;
+    box-shadow: 0 2px 12px rgba(184,134,11,0.08);
+  }
+
+  .add-book-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .add-book-header .icon-wrap {
+    width: 46px; height: 46px;
+    background: #fdf3d8;
+    border: 1.5px solid #e8d5a3;
+    border-radius: 11px;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 0.75rem;
+  }
+
+  .add-book-header h2 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1a2a4a;
+    margin: 0;
+  }
+
+  .add-book-header p {
+    font-size: 12.5px;
+    color: #7a8a9a;
+    margin: 0.2rem 0 0;
+  }
+
+  hr.divider { border: none; border-top: 0.5px solid #f0e8d0; margin: 1.25rem 0; }
+
+  .lms-field { margin-bottom: 0.85rem; }
+
+  .lms-field label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: #4a5568;
+    margin-bottom: 4px;
+  }
+
+  .lms-field input,
+  .lms-field select {
+    width: 100%;
+    height: 38px;
+    border: 0.5px solid #ddd;
+    border-radius: 7px;
+    padding: 0 11px;
+    font-size: 13px;
+    color: #1a2a4a;
+    background: #fdfaf5;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+
+  .lms-field input[type="file"] { height: auto; padding: 5px 11px; }
+  .lms-field input[type="checkbox"] { width: auto; height: auto; margin-right: 6px; }
+
+  .lms-field input:focus,
+  .lms-field select:focus {
+    border-color: #c8a84b;
+    box-shadow: 0 0 0 3px rgba(200,168,75,0.12);
+    background: #fff;
+  }
+
+  .text-danger { font-size: 11.5px; color: #dc3545; margin-top: 3px; }
+
+  .btn-row { display: flex; gap: 8px; margin-top: 0.5rem; }
+
+  .lms-submit-btn {
+    flex: 1;
+    height: 40px;
+    background: #1a2a4a;
+    color: #fff;
+    border: none;
+    border-radius: 7px;
+    font-size: 13.5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .lms-submit-btn:hover { background: #b8860b; }
+
+  .lms-back-btn {
+    flex: 1;
+    height: 40px;
+    background: #fdf3d8;
+    color: #7a5800;
+    border: 0.5px solid #e8d5a3;
+    border-radius: 7px;
+    font-size: 13.5px;
+    font-weight: 500;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+  }
+  .lms-back-btn:hover { background: #b8860b; color: #fff; text-decoration: none; }
+</style>
+
+<div class="add-book-wrap">
+  <div class="add-book-card">
+
+    <div class="add-book-header">
+      <div class="icon-wrap">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="#b8860b" stroke-width="1.6" stroke-linecap="round"/>
+          <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="#b8860b" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h2>Update Book</h2>
+      <p>Edit the book details below</p>
+    </div>
+
+    <hr class="divider">
+
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      <div class="lms-field">
+        <label>Book Name</label>
+        {{ form.name }}
+        {% if form.name.errors %}<div class="text-danger">{{ form.name.errors }}</div>{% endif %}
+      </div>
+
+      <div class="lms-field">
+        <label>ISBN</label>
+        {{ form.isbn }}
+        {% if form.isbn.errors %}<div class="text-danger">{{ form.isbn.errors }}</div>{% endif %}
+      </div>
+
+      <div class="lms-field">
+        <label>Author</label>
+        {{ form.author }}
+        {% if form.author.errors %}<div class="text-danger">{{ form.author.errors }}</div>{% endif %}
+      </div>
+
+      <div class="lms-field">
+        <label>Price</label>
+        {{ form.price }}
+        {% if form.price.errors %}<div class="text-danger">{{ form.price.errors }}</div>{% endif %}
+      </div>
+
+      <div class="lms-field">
+        <label>Category</label>
+        {{ form.category }}
+        {% if form.category.errors %}<div class="text-danger">{{ form.category.errors }}</div>{% endif %}
+      </div>
+
+      <div class="lms-field">
+        <label>Cover Image</label>
+        {{ form.cover }}
+        {% if form.cover.errors %}<div class="text-danger">{{ form.cover.errors }}</div>{% endif %}
+      </div>
+
+      <div class="lms-field" style="display:flex;align-items:center;">
+        {{ form.is_active }}
+        <label style="margin:0;">Active</label>
+      </div>
+
+      <div class="btn-row">
+        <button type="submit" class="lms-submit-btn">Update Book</button>
+        <a href="{% url 'view_books' %}" class="lms-back-btn">Back</a>
+      </div>
+    </form>
+
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.lms-ub-toast').forEach(function (t) {
+      setTimeout(function () {
+        t.style.animation = 'lms-fade-out 0.3s ease forwards';
+        setTimeout(function () { t.remove(); }, 300);
+      }, 4000);
+    });
+  });
+</script>
+
+{% endblock %}

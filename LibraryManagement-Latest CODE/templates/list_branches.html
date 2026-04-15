@@ -1,0 +1,117 @@
+{% extends 'base2.html' %}
+{% block content %}
+
+<!-- Toast -->
+<div style="position:fixed;top:80px;right:1.5rem;z-index:9999;display:flex;flex-direction:column;gap:10px;">
+  {% for message in messages %}
+  <div class="lms-br-toast {% if 'error' in message.tags %}toast-error{% else %}toast-success{% endif %}" style="background:#fff;border:0.5px solid #e8d5a3;border-radius:8px;padding:12px 42px 12px 14px;min-width:280px;max-width:360px;position:relative;animation:lms-slide-in 0.25s ease;">
+    <div style="font-size:13px;font-weight:600;color:#1a2a4a;margin-bottom:2px;">{% if 'error' in message.tags %}Error{% else %}Success{% endif %}</div>
+    <div style="font-size:12.5px;color:#5a6a82;">{{ message }}</div>
+    <button onclick="this.closest('.lms-br-toast').remove()" style="position:absolute;top:8px;right:10px;background:none;border:none;font-size:16px;color:#aaa;cursor:pointer;">&times;</button>
+  </div>
+  {% endfor %}
+</div>
+
+<style>
+  @keyframes lms-slide-in { from { opacity:0; transform:translateX(30px); } to { opacity:1; transform:translateX(0); } }
+  @keyframes lms-fade-out  { from { opacity:1; } to { opacity:0; transform:translateX(30px); } }
+  .toast-success { border-left: 4px solid #1d9e75; }
+  .toast-error   { border-left: 4px solid #e24b4a; }
+
+  .page-wrap { max-width: 700px; margin: 2rem auto; padding: 0 1.25rem; }
+
+  .page-heading { font-size: 1.1rem; font-weight: 600; color: #7a5800; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; }
+  .page-heading-left { display: flex; align-items: center; gap: 8px; }
+  .page-heading-left span { display: inline-block; width: 4px; height: 18px; background: #b8860b; border-radius: 3px; }
+
+  .btn-lms-add { display: inline-flex; align-items: center; gap: 5px; padding: 7px 14px; background: #1a2a4a; color: #fff; border: none; border-radius: 7px; font-size: 13px; font-weight: 500; text-decoration: none; transition: background 0.15s; cursor: pointer; }
+  .btn-lms-add:hover { background: #b8860b; color: #fff; text-decoration: none; }
+
+  .lms-table-wrap { background: #fff; border: 0.5px solid #e8d5a3; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(184,134,11,0.07); }
+  .lms-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .lms-table thead tr { background: #fdf3d8; border-bottom: 1px solid #e8d5a3; }
+  .lms-table thead th { padding: 11px 14px; font-size: 11.5px; font-weight: 600; color: #7a5800; text-transform: uppercase; letter-spacing: 0.07em; text-align: left; }
+  .lms-table tbody tr { border-bottom: 0.5px solid #f0e8d0; transition: background 0.12s; }
+  .lms-table tbody tr:last-child { border-bottom: none; }
+  .lms-table tbody tr:hover { background: #fffdf7; }
+  .lms-table tbody td { padding: 10px 14px; color: #3a4a5a; vertical-align: middle; }
+
+  .btn-lms-del { display: inline-flex; align-items: center; gap: 4px; padding: 5px 11px; font-size: 12px; font-weight: 500; border-radius: 6px; border: 0.5px solid #f5b8b4; background: #fce8e6; color: #d93025; cursor: pointer; text-decoration: none; transition: background 0.13s; }
+  .btn-lms-del:hover { background: #d93025; color: #fff; border-color: #d93025; text-decoration: none; }
+
+  .empty-state { text-align: center; padding: 3rem 1rem; color: #9a8060; font-size: 14px; }
+</style>
+
+<div class="page-wrap">
+  <div class="page-heading">
+    <div class="page-heading-left">
+      <span></span> Branches
+    </div>
+    <a href="{% url 'add_branch' %}" class="btn-lms-add">+ Add Branch</a>
+  </div>
+
+  <div class="lms-table-wrap">
+    {% if branches %}
+    <table class="lms-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Branch Name</th>
+          <th>Created</th>
+          <th>Students</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for b in branches %}
+        <tr>
+          <td>{{ forloop.counter }}</td>
+          <td>{{ b.name }}</td>
+          <td>{{ b.created_at|date:"d M Y" }}</td>
+          <td>{{ b.students.count }}</td>
+          <td>
+            <a href="#" class="btn-lms-del" data-url="{% url 'delete_branch' b.id %}" data-name="{{ b.name }}" onclick="confirmDelete(this)">Delete</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">No branches added yet.</div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Delete Modal -->
+<div id="deleteModal" style="display:none;position:fixed;inset:0;z-index:9999;align-items:center;justify-content:center;">
+  <div style="position:absolute;inset:0;background:rgba(0,0,0,0.35);" onclick="closeModal()"></div>
+  <div style="position:relative;background:#fff;border:0.5px solid #e8d5a3;border-radius:14px;padding:2rem;max-width:380px;width:90%;box-shadow:0 8px 32px rgba(184,134,11,0.15);z-index:1;">
+    <div style="width:48px;height:48px;background:#fce8e6;border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" stroke="#d93025" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div style="text-align:center;margin-bottom:1.5rem;">
+      <div style="font-size:1rem;font-weight:600;color:#1a2a4a;margin-bottom:0.4rem;">Delete Branch</div>
+      <div style="font-size:13px;color:#5a6a82;">Are you sure you want to delete <strong id="branchName"></strong>?</div>
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button onclick="closeModal()" style="flex:1;height:40px;background:#fdf3d8;color:#7a5800;border:0.5px solid #e8d5a3;border-radius:7px;font-size:13.5px;font-weight:500;cursor:pointer;">Cancel</button>
+      <a id="confirmDeleteBtn" href="#" style="flex:1;height:40px;background:#d93025;color:#fff;border:none;border-radius:7px;font-size:13.5px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;text-decoration:none;">Delete</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  function confirmDelete(el) {
+    document.getElementById('branchName').textContent = el.getAttribute('data-name');
+    document.getElementById('confirmDeleteBtn').href = el.getAttribute('data-url');
+    document.getElementById('deleteModal').style.display = 'flex';
+  }
+  function closeModal() { document.getElementById('deleteModal').style.display = 'none'; }
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.lms-br-toast').forEach(function (t) {
+      setTimeout(function () { t.style.animation = 'lms-fade-out 0.3s ease forwards'; setTimeout(function () { t.remove(); }, 300); }, 4000);
+    });
+  });
+</script>
+
+{% endblock %}

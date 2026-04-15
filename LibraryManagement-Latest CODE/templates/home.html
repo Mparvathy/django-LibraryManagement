@@ -1,0 +1,262 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<style>
+  body {
+    background: #fdf8f0;
+    font-family: 'Segoe UI', sans-serif;
+  }
+
+  /* ── Carousel ── */
+  .lms-carousel {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .lms-carousel .carousel-item img {
+    height: 480px;
+    object-fit: cover;
+    object-position: center;
+    filter: brightness(0.82);
+  }
+
+  .lms-carousel .carousel-caption {
+    bottom: 2.5rem;
+    text-align: left;
+    max-width: 560px;
+  }
+
+  .lms-carousel .carousel-caption h5 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #ffffff;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.35);
+    margin-bottom: 0.5rem;
+  }
+
+  .lms-carousel .carousel-caption p {
+    font-size: 1rem;
+    color: rgba(255,255,255,0.88);
+    text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  }
+
+  .carousel-indicators li {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.6);
+    border: none;
+  }
+
+  .carousel-indicators li.active {
+    background: #c8a84b;
+    width: 24px;
+    border-radius: 4px;
+  }
+
+  /* ── Welcome strip ── */
+  .lms-welcome {
+    background: #ffffff;
+    border-bottom: 1px solid #f0e8d0;
+    padding: 2.5rem 2rem 2rem;
+    text-align: center;
+  }
+
+  .lms-welcome h1 {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: #1a2a4a;
+    margin-bottom: 0.75rem;
+    letter-spacing: 0.01em;
+  }
+
+  .lms-welcome p.lead {
+    font-size: 1rem;
+    color: #5a6a82;
+    max-width: 640px;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+
+  .lms-divider {
+    border: none;
+    border-top: 1.5px solid #e8d5a3;
+    margin: 2rem auto;
+    width: 60px;
+  }
+
+  /* ── Panel cards ── */
+  .lms-panels {
+    padding: 2rem 1.5rem 3rem;
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .lms-panel-card {
+    background: #ffffff;
+    border: 0.5px solid #e8d5a3;
+    border-radius: 12px;
+    padding: 2rem 2rem 1.75rem;
+    width: 260px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transition: box-shadow 0.2s, transform 0.2s;
+  }
+
+  .lms-panel-card:hover {
+    box-shadow: 0 6px 24px rgba(184,134,11,0.12);
+    transform: translateY(-3px);
+  }
+
+  .lms-panel-icon {
+    width: 90px;
+    height: 90px;
+    object-fit: contain;
+    margin-bottom: 1.25rem;
+  }
+
+  .lms-panel-title {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #1a2a4a;
+    margin-bottom: 0.5rem;
+  }
+
+  .lms-panel-desc {
+    font-size: 0.85rem;
+    color: #7a8a9a;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+  }
+
+  .lms-btn {
+    display: inline-block;
+    padding: 9px 28px;
+    border-radius: 6px;
+    font-size: 13.5px;
+    font-weight: 500;
+    text-decoration: none;
+    letter-spacing: 0.02em;
+    transition: background 0.15s, color 0.15s;
+    border: 1.5px solid #b8860b;
+    color: #7a5800;
+    background: #fdf3d8;
+  }
+
+  .lms-btn:hover {
+    background: #b8860b;
+    color: #ffffff;
+    text-decoration: none;
+  }
+
+  /* ── Footer strip ── */
+  .lms-footer {
+    background: #1a2a4a;
+    color: rgba(255,255,255,0.55);
+    text-align: center;
+    font-size: 12.5px;
+    padding: 1rem;
+    letter-spacing: 0.03em;
+  }
+
+  .lms-footer span {
+    color: #c8a84b;
+  }
+
+  @media (max-width: 600px) {
+    .lms-carousel .carousel-item img {
+      height: 240px;
+    }
+    .lms-carousel .carousel-caption h5 {
+      font-size: 1.25rem;
+    }
+    .lms-panel-card {
+      width: 100%;
+      max-width: 340px;
+    }
+  }
+</style>
+
+<!-- ── Carousel ── -->
+<div id="lmsCarousel" class="carousel slide lms-carousel" data-ride="carousel">
+  <ol class="carousel-indicators">
+    <li data-target="#lmsCarousel" data-slide-to="0" class="active"></li>
+    <li data-target="#lmsCarousel" data-slide-to="1"></li>
+    <li data-target="#lmsCarousel" data-slide-to="2"></li>
+  </ol>
+  <div class="carousel-inner">
+    <div class="carousel-item active">
+      <img class="d-block w-100" src="https://images.pexels.com/photos/694740/pexels-photo-694740.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="Library shelves">
+      <div class="carousel-caption d-none d-md-block">
+        <h5>Welcome to the Library</h5>
+        <p>Explore thousands of books, journals and digital resources.</p>
+      </div>
+    </div>
+    <div class="carousel-item">
+      <img class="d-block w-100" src="https://images.pexels.com/photos/2908984/pexels-photo-2908984.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750" alt="Reading room">
+      <div class="carousel-caption d-none d-md-block">
+        <h5>A Space to Learn</h5>
+        <p>Quiet reading rooms and collaborative study spaces available.</p>
+      </div>
+    </div>
+    <div class="carousel-item">
+      <img class="d-block w-100" src="https://images.pexels.com/photos/2767814/pexels-photo-2767814.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750" alt="Books">
+      <div class="carousel-caption d-none d-md-block">
+        <h5>Knowledge at Your Fingertips</h5>
+        <p>Online access, 24/7 support, and professional guidance.</p>
+      </div>
+    </div>
+  </div>
+  <a class="carousel-control-prev" href="#lmsCarousel" role="button" data-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="sr-only">Previous</span>
+  </a>
+  <a class="carousel-control-next" href="#lmsCarousel" role="button" data-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="sr-only">Next</span>
+  </a>
+</div>
+
+<!-- ── Welcome section ── -->
+<div class="lms-welcome">
+  <h1>Library Management System</h1>
+
+  <p class="lead">
+    A service dedicated to Admins and Students. We provide online resources, professional support
+    and guidance to all our students — whenever, and from wherever they have chosen to study.
+  </p>
+</div>
+
+<!-- ── Panel cards ── -->
+<div class="lms-panels">
+
+  <div class="lms-panel-card">
+    <img
+      class="lms-panel-icon"
+      src="https://static.vecteezy.com/system/resources/thumbnails/009/636/683/small_2x/admin-3d-illustration-icon-png.png"
+      alt="Admin icon">
+    <div class="lms-panel-title">Admin Panel</div>
+    <div class="lms-panel-desc">Manage books, members, issued records and system settings from one place.</div>
+    <a href="{% url 'adminclick' %}" class="lms-btn">Go to Admin</a>
+  </div>
+
+  <div class="lms-panel-card">
+    <img
+      class="lms-panel-icon"
+      src="https://www.freeiconspng.com/uploads/school-student-icon-18.png"
+      alt="Student icon">
+    <div class="lms-panel-title">Student Panel</div>
+    <div class="lms-panel-desc">Search the catalogue, check borrowed books and view your account history.</div>
+    <a href="{% url 'studentclick' %}" class="lms-btn">Go to Student</a>
+  </div>
+
+</div>
+
+
+
+{% endblock %}

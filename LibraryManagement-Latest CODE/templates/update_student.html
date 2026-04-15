@@ -1,0 +1,175 @@
+{% extends 'base2.html' %}
+{% block content %}
+
+<style>
+  .add-book-wrap {
+    min-height: calc(100vh - 64px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    background: #fdf8f0;
+  }
+
+  .add-book-card {
+    background: #ffffff;
+    border: 0.5px solid #e8d5a3;
+    border-radius: 14px;
+    width: 100%;
+    max-width: 420px;
+    padding: 2rem;
+    box-shadow: 0 2px 12px rgba(184,134,11,0.08);
+  }
+
+  .add-book-header { text-align: center; margin-bottom: 1.5rem; }
+
+  .add-book-header .icon-wrap {
+    width: 46px; height: 46px;
+    background: #fdf3d8;
+    border: 1.5px solid #e8d5a3;
+    border-radius: 11px;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 0.75rem;
+  }
+
+  .add-book-header h2 { font-size: 1.1rem; font-weight: 600; color: #1a2a4a; margin: 0; }
+  .add-book-header p  { font-size: 12.5px; color: #7a8a9a; margin: 0.2rem 0 0; }
+
+  hr.divider { border: none; border-top: 0.5px solid #f0e8d0; margin: 1.25rem 0; }
+
+  .lms-field { margin-bottom: 0.85rem; }
+
+  .lms-field label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: #4a5568;
+    margin-bottom: 4px;
+  }
+
+  .lms-field input {
+    width: 100%;
+    height: 38px;
+    border: 0.5px solid #ddd;
+    border-radius: 7px;
+    padding: 0 11px;
+    font-size: 13px;
+    color: #1a2a4a;
+    background: #fdfaf5;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+
+  .lms-field select {
+    width: 100%;
+    height: 38px;
+    border: 0.5px solid #ddd;
+    border-radius: 7px;
+    padding: 0 11px;
+    font-size: 13px;
+    color: #1a2a4a;
+    background: #fdfaf5;
+    outline: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23b8860b' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 11px center;
+    cursor: pointer;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+
+  .lms-field input:focus,
+  .lms-field select:focus {
+    border-color: #c8a84b;
+    box-shadow: 0 0 0 3px rgba(200,168,75,0.12);
+    background-color: #fff;
+  }
+
+  .btn-row { display: flex; gap: 8px; margin-top: 0.5rem; }
+
+  .lms-submit-btn {
+    flex: 1; height: 40px;
+    background: #1a2a4a; color: #fff;
+    border: none; border-radius: 7px;
+    font-size: 13.5px; font-weight: 500;
+    cursor: pointer; transition: background 0.15s;
+  }
+  .lms-submit-btn:hover { background: #b8860b; }
+
+  .lms-back-btn {
+    flex: 1; height: 40px;
+    background: #fdf3d8; color: #7a5800;
+    border: 0.5px solid #e8d5a3; border-radius: 7px;
+    font-size: 13.5px; font-weight: 500;
+    text-decoration: none;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s;
+  }
+  .lms-back-btn:hover { background: #b8860b; color: #fff; text-decoration: none; }
+</style>
+
+<div class="add-book-wrap">
+  <div class="add-book-card">
+
+    <div class="add-book-header">
+      <div class="icon-wrap">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="8" r="4" stroke="#b8860b" stroke-width="1.6"/>
+          <path d="M4 20c0-4 3.582-7 8-7s8 3 8 7" stroke="#b8860b" stroke-width="1.6" stroke-linecap="round"/>
+          <path d="M16 3l2 2-6 6H10v-2l6-6z" stroke="#b8860b" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h2>Update Student</h2>
+      <p>Edit the student details below</p>
+    </div>
+
+    <hr class="divider">
+
+    <form method="POST">
+      {% csrf_token %}
+
+      <div class="lms-field">
+        <label>Full Name</label>
+        <input type="text" name="first_name" value="{{ student.first_name }}" required>
+      </div>
+
+      <div class="lms-field">
+        <label>Username</label>
+        <input type="text" name="u" value="{{ student.username }}" required>
+      </div>
+
+      <div class="lms-field">
+        <label>Email</label>
+        <input type="email" name="e" value="{{ student.email }}">
+      </div>
+
+      <div class="lms-field">
+        <label>Enrollment</label>
+        <input type="text" name="enrollment" value="{{ student.enrollment }}">
+      </div>
+
+      <div class="lms-field">
+        <label>Branch</label>
+        <select name="branch">
+          <option value="">-- Select Branch --</option>
+          {% for b in branches %}
+          <option value="{{ b.id }}" {% if student.branch and student.branch.id == b.id %}selected{% endif %}>{{ b.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="lms-field">
+        <label>Phone</label>
+        <input type="text" name="n" value="{{ student.phone|default:'' }}">
+      </div>
+
+      <div class="btn-row">
+        <button type="submit" class="lms-submit-btn">Update Student</button>
+        <a href="{% url 'list_students' %}" class="lms-back-btn">Cancel</a>
+      </div>
+    </form>
+
+  </div>
+</div>
+
+{% endblock %}

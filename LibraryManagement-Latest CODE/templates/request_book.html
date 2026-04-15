@@ -1,0 +1,156 @@
+{% extends 'base3.html' %}
+{% block content %}
+
+<!-- Toast -->
+<div style="position:fixed;top:80px;right:1.5rem;z-index:9999;display:flex;flex-direction:column;gap:10px;">
+  {% for message in messages %}
+  <div class="lms-rb-toast {% if 'error' in message.tags %}toast-error{% else %}toast-success{% endif %}" style="background:#fff;border:0.5px solid #e8d5a3;border-radius:8px;padding:12px 42px 12px 14px;min-width:280px;max-width:360px;position:relative;animation:lms-slide-in 0.25s ease;">
+    <div style="font-size:13px;font-weight:600;color:#1a2a4a;margin-bottom:2px;">{% if 'error' in message.tags %}Error{% else %}Success{% endif %}</div>
+    <div style="font-size:12.5px;color:#5a6a82;">{{ message }}</div>
+    <button onclick="this.closest('.lms-rb-toast').remove()" style="position:absolute;top:8px;right:10px;background:none;border:none;font-size:16px;color:#aaa;cursor:pointer;">&times;</button>
+  </div>
+  {% endfor %}
+</div>
+
+<style>
+  @keyframes lms-slide-in { from { opacity:0; transform:translateX(30px); } to { opacity:1; transform:translateX(0); } }
+  @keyframes lms-fade-out  { from { opacity:1; } to { opacity:0; transform:translateX(30px); } }
+  .toast-success { border-left: 4px solid #1d9e75; }
+  .toast-error   { border-left: 4px solid #e24b4a; }
+
+  .add-book-wrap {
+    min-height: calc(100vh - 64px);
+    display: flex; align-items: center; justify-content: center;
+    padding: 2rem 1rem; background: #fdf8f0;
+  }
+
+  .add-book-card {
+    background: #fff; border: 0.5px solid #e8d5a3;
+    border-radius: 14px; width: 100%; max-width: 420px;
+    padding: 2rem; box-shadow: 0 2px 12px rgba(184,134,11,0.08);
+  }
+
+  .add-book-header { text-align: center; margin-bottom: 1.5rem; }
+
+  .add-book-header .icon-wrap {
+    width: 46px; height: 46px; background: #fdf3d8;
+    border: 1.5px solid #e8d5a3; border-radius: 11px;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 0.75rem;
+  }
+
+  .add-book-header h2 { font-size: 1.1rem; font-weight: 600; color: #1a2a4a; margin: 0; }
+  .add-book-header p  { font-size: 12.5px; color: #7a8a9a; margin: 0.2rem 0 0; }
+
+  hr.divider { border: none; border-top: 0.5px solid #f0e8d0; margin: 1.25rem 0; }
+
+  .lms-field { margin-bottom: 0.85rem; }
+  .lms-field label { display: block; font-size: 12px; font-weight: 500; color: #4a5568; margin-bottom: 4px; }
+
+  .lms-field select {
+    width: 100%; height: 38px;
+    border: 0.5px solid #ddd; border-radius: 7px;
+    padding: 0 11px; font-size: 13px; color: #1a2a4a;
+    background: #fdfaf5; outline: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23b8860b' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 11px center;
+    cursor: pointer;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .lms-field select:focus {
+    border-color: #c8a84b;
+    box-shadow: 0 0 0 3px rgba(200,168,75,0.12);
+    background-color: #fff;
+  }
+
+  .issued-warning {
+    display: none;
+    background: #fef7e0; border: 0.5px solid #e8d5a3;
+    border-left: 4px solid #b8860b; border-radius: 7px;
+    padding: 10px 14px; font-size: 12.5px; color: #7a5800;
+    margin-top: 6px;
+  }
+
+  .lms-submit-btn {
+    width: 100%; height: 40px; background: #1a2a4a;
+    color: #fff; border: none; border-radius: 7px;
+    font-size: 13.5px; font-weight: 500; cursor: pointer;
+    margin-top: 0.5rem; transition: background 0.15s;
+  }
+  .lms-submit-btn:hover { background: #b8860b; }
+</style>
+
+<div class="add-book-wrap">
+  <div class="add-book-card">
+
+    <div class="add-book-header">
+      <div class="icon-wrap">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="7" r="5" stroke="#b8860b" stroke-width="1.6"/>
+          <path d="M4 20c0-4 3.582-7 8-7s8 3 8 7" stroke="#b8860b" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h2>Request a Book</h2>
+      <p>Select a book to send a request to the admin</p>
+    </div>
+
+    <hr class="divider">
+
+    <form method="post">
+      {% csrf_token %}
+
+      <div class="lms-field">
+        <label>Select Book</label>
+        {{ form.book }}
+        <div class="issued-warning" id="issuedWarning">
+          ⚠️ This book is currently issued to another student.
+        </div>
+        {% if form.book.errors %}<div style="font-size:11.5px;color:#dc3545;margin-top:3px;">{{ form.book.errors }}</div>{% endif %}
+      </div>
+
+      <button type="submit" class="lms-submit-btn">Request Book</button>
+    </form>
+
+  </div>
+</div>
+
+<div id="issuedData" data-ids="{{ issued_book_ids|join:',' }}" style="display:none;"></div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const raw = document.getElementById('issuedData').getAttribute('data-ids');
+    const issuedIds = raw ? raw.split(',').map(Number) : [];
+    const select = document.querySelector('[name="book"]');
+    const warning = document.getElementById('issuedWarning');
+    const btn = document.querySelector('.lms-submit-btn');
+
+    function checkIssued() {
+      const val = parseInt(select.value);
+      if (issuedIds.includes(val)) {
+        warning.style.display = 'block';
+        btn.disabled = true;
+        btn.style.background = '#ccc';
+        btn.style.cursor = 'not-allowed';
+      } else {
+        warning.style.display = 'none';
+        btn.disabled = false;
+        btn.style.background = '';
+        btn.style.cursor = '';
+      }
+    }
+
+    select.addEventListener('change', checkIssued);
+    checkIssued();
+
+    document.querySelectorAll('.lms-rb-toast').forEach(function (t) {
+      setTimeout(function () {
+        t.style.animation = 'lms-fade-out 0.3s ease forwards';
+        setTimeout(function () { t.remove(); }, 300);
+      }, 4000);
+    });
+  });
+</script>
+
+{% endblock %}

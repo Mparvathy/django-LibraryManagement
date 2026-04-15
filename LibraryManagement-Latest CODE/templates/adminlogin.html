@@ -1,0 +1,347 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<style>
+  body {
+    background: #fdf8f0;
+    font-family: 'Segoe UI', sans-serif;
+  }
+
+  /* ── Page layout ── */
+  .lms-login-page {
+    min-height: calc(100vh - 64px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2.5rem 1rem 3rem;
+  }
+
+  /* ── Card ── */
+  .lms-login-card {
+    background: #ffffff;
+    border: 0.5px solid #e8d5a3;
+    border-radius: 14px;
+    width: 100%;
+    max-width: 420px;
+    padding: 2.25rem 2.25rem 2rem;
+  }
+
+  /* ── Header ── */
+  .lms-login-header {
+    text-align: center;
+    margin-bottom: 1.75rem;
+  }
+
+  .lms-login-header .lms-icon-wrap {
+    width: 52px;
+    height: 52px;
+    background: #fdf3d8;
+    border: 1.5px solid #e8d5a3;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+  }
+
+  .lms-login-header h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1a2a4a;
+    margin-bottom: 0.25rem;
+  }
+
+  .lms-login-header p {
+    font-size: 13px;
+    color: #7a8a9a;
+    margin: 0;
+  }
+
+  /* ── Divider ── */
+  .lms-form-divider {
+    border: none;
+    border-top: 0.5px solid #f0e8d0;
+    margin: 1.25rem 0;
+  }
+
+  /* ── Fields ── */
+  .lms-field {
+    margin-bottom: 1rem;
+  }
+
+  .lms-field label {
+    display: block;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: #4a5568;
+    margin-bottom: 5px;
+    letter-spacing: 0.02em;
+  }
+
+  .lms-field .input-wrap {
+    position: relative;
+  }
+
+  .lms-field .input-icon {
+    position: absolute;
+    left: 11px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #b8a080;
+    pointer-events: none;
+  }
+
+  .lms-field input {
+    width: 100%;
+    height: 42px;
+    border: 0.5px solid #ddd;
+    border-radius: 7px;
+    padding: 0 12px 0 36px;
+    font-size: 13.5px;
+    color: #1a2a4a;
+    background: #fdfaf5;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+
+  .lms-field input:focus {
+    border-color: #c8a84b;
+    box-shadow: 0 0 0 3px rgba(200,168,75,0.12);
+    background: #fff;
+  }
+
+  .lms-field input::placeholder {
+    color: #b0bac8;
+  }
+
+  /* ── Password toggle ── */
+  .lms-field .toggle-pw {
+    position: absolute;
+    right: 11px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: #b8a080;
+    line-height: 1;
+  }
+
+  .lms-field .toggle-pw:hover {
+    color: #7a5800;
+  }
+
+  .lms-field .input-wrap input[type="password"],
+  .lms-field .input-wrap input[type="text"] {
+    padding-right: 36px;
+  }
+
+  /* ── Submit ── */
+  .lms-submit-btn {
+    width: 100%;
+    height: 42px;
+    background: #1a2a4a;
+    color: #ffffff;
+    border: none;
+    border-radius: 7px;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    margin-top: 0.5rem;
+    transition: background 0.15s;
+  }
+
+  .lms-submit-btn:hover {
+    background: #b8860b;
+  }
+
+  /* ── Footer link ── */
+  .lms-signup-link {
+    text-align: center;
+    margin-top: 1.1rem;
+    font-size: 13px;
+    color: #7a8a9a;
+  }
+
+  .lms-signup-link a {
+    color: #b8860b;
+    font-weight: 500;
+    text-decoration: none;
+  }
+
+  .lms-signup-link a:hover {
+    text-decoration: underline;
+  }
+
+  /* ── Toast ── */
+  .lms-toast-container {
+    position: fixed;
+    top: 80px;
+    right: 1.5rem;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .lms-toast {
+    background: #ffffff;
+    border: 0.5px solid #e8d5a3;
+    border-left: 4px solid #c8a84b;
+    border-radius: 8px;
+    padding: 12px 42px 12px 14px;
+    min-width: 280px;
+    max-width: 360px;
+    position: relative;
+    animation: lms-slide-in 0.25s ease;
+  }
+
+  .lms-toast.lms-toast-error  { border-left-color: #e24b4a; }
+  .lms-toast.lms-toast-success { border-left-color: #1d9e75; }
+
+  .lms-toast-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1a2a4a;
+    margin-bottom: 2px;
+  }
+
+  .lms-toast-body {
+    font-size: 12.5px;
+    color: #5a6a82;
+    line-height: 1.5;
+  }
+
+  .lms-toast-close {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 16px;
+    color: #aaa;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+  }
+
+  .lms-toast-close:hover { color: #555; }
+
+  @keyframes lms-slide-in {
+    from { opacity: 0; transform: translateX(30px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+
+  @keyframes lms-fade-out {
+    from { opacity: 1; }
+    to   { opacity: 0; transform: translateX(30px); }
+  }
+</style>
+
+<!-- ── Toast container ── -->
+<div class="lms-toast-container" id="lmsToastContainer">
+  {% if messages %}
+    {% for message in messages %}
+      <div class="lms-toast {% if 'error' in message.tags %}lms-toast-error{% elif 'success' in message.tags %}lms-toast-success{% endif %}" role="alert">
+        <div class="lms-toast-title">
+          {% if 'error' in message.tags %}Error{% elif 'success' in message.tags %}Success{% else %}Notice{% endif %}
+        </div>
+        <div class="lms-toast-body">{{ message }}</div>
+        <button class="lms-toast-close" onclick="dismissToast(this)">&times;</button>
+      </div>
+    {% endfor %}
+  {% endif %}
+</div>
+
+<!-- ── Login page ── -->
+<div class="lms-login-page">
+  <div class="lms-login-card">
+
+    <!-- Header -->
+    <div class="lms-login-header">
+      <div class="lms-icon-wrap">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="8" r="4" stroke="#b8860b" stroke-width="1.6"/>
+          <path d="M4 20c0-4 3.582-7 8-7s8 3 8 7" stroke="#b8860b" stroke-width="1.6" stroke-linecap="round"/>
+          <rect x="15" y="12" width="7" height="5" rx="1" stroke="#1a2a4a" stroke-width="1.4"/>
+          <path d="M18.5 12v-1.5a1.5 1.5 0 013 0V12" stroke="#1a2a4a" stroke-width="1.4" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h2>Admin Login</h2>
+      <p>Sign in to your administrator account</p>
+    </div>
+
+    <hr class="lms-form-divider">
+
+    <!-- Form -->
+    <form method="POST">
+      {% csrf_token %}
+
+      <div class="lms-field">
+        <label for="username">Username</label>
+        <div class="input-wrap">
+          <span class="input-icon">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <circle cx="7" cy="4.5" r="2.5" stroke="currentColor" stroke-width="1.4"/>
+              <path d="M2 12c0-2.761 2.239-4 5-4s5 1.239 5 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+            </svg>
+          </span>
+          <input type="text" id="username" name="u" placeholder="Enter username" required>
+        </div>
+      </div>
+
+      <div class="lms-field">
+        <label for="password">Password</label>
+        <div class="input-wrap">
+          <span class="input-icon">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <rect x="2" y="6" width="10" height="7" rx="1.5" stroke="currentColor" stroke-width="1.4"/>
+              <path d="M4.5 6V4.5a2.5 2.5 0 015 0V6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+              <circle cx="7" cy="9.5" r="1" fill="currentColor"/>
+            </svg>
+          </span>
+          <input type="password" id="password" name="p" placeholder="Enter password" required>
+          <button type="button" class="toggle-pw" onclick="togglePassword()" title="Show/hide password">
+            <svg id="eye-icon" width="15" height="15" viewBox="0 0 15 15" fill="none">
+              <path d="M1 7.5C1 7.5 3.5 3 7.5 3s6.5 4.5 6.5 4.5S11.5 12 7.5 12 1 7.5 1 7.5z" stroke="currentColor" stroke-width="1.3"/>
+              <circle cx="7.5" cy="7.5" r="2" stroke="currentColor" stroke-width="1.3"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <button type="submit" class="lms-submit-btn">Login</button>
+
+      <div class="lms-signup-link">
+        Don't have an account? <a href="{% url 'adminsignup' %}">Sign up here</a>
+      </div>
+    </form>
+
+  </div>
+</div>
+
+<script>
+  function togglePassword() {
+    const input = document.getElementById('password');
+    input.type = input.type === 'password' ? 'text' : 'password';
+  }
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.lms-toast').forEach(function (toast) {
+      setTimeout(function () { fadeOutToast(toast); }, 4000);
+    });
+  });
+
+  function dismissToast(btn) {
+    fadeOutToast(btn.closest('.lms-toast'));
+  }
+
+  function fadeOutToast(toast) {
+    toast.style.animation = 'lms-fade-out 0.3s ease forwards';
+    setTimeout(function () { toast.remove(); }, 300);
+  }
+</script>
+
+{% endblock %}

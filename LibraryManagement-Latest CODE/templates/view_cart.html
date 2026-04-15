@@ -1,0 +1,198 @@
+{% extends 'base3.html' %}
+{% load static %}
+{% block content %}
+
+<!-- Toast -->
+<div style="position:fixed;top:80px;right:1.5rem;z-index:9999;display:flex;flex-direction:column;gap:10px;">
+  {% for message in messages %}
+  <div class="lms-vc-toast {% if 'error' in message.tags %}toast-error{% else %}toast-success{% endif %}" style="background:#fff;border:0.5px solid #e8d5a3;border-radius:8px;padding:12px 42px 12px 14px;min-width:280px;max-width:360px;position:relative;animation:lms-slide-in 0.25s ease;">
+    <div style="font-size:13px;font-weight:600;color:#1a2a4a;margin-bottom:2px;">{% if 'error' in message.tags %}Error{% else %}Success{% endif %}</div>
+    <div style="font-size:12.5px;color:#5a6a82;">{{ message }}</div>
+    <button onclick="this.closest('.lms-vc-toast').remove()" style="position:absolute;top:8px;right:10px;background:none;border:none;font-size:16px;color:#aaa;cursor:pointer;">&times;</button>
+  </div>
+  {% endfor %}
+</div>
+
+<style>
+  @keyframes lms-slide-in { from { opacity:0; transform:translateX(30px); } to { opacity:1; transform:translateX(0); } }
+  @keyframes lms-fade-out  { from { opacity:1; } to { opacity:0; transform:translateX(30px); } }
+  .toast-success { border-left: 4px solid #1d9e75; }
+  .toast-error   { border-left: 4px solid #e24b4a; }
+  .page-wrap { max-width: 900px; margin: 2rem auto; padding: 0 1.25rem; }
+
+  .page-heading {
+    font-size: 1.1rem; font-weight: 600; color: #7a5800;
+    margin-bottom: 1.5rem; display: flex; align-items: center; gap: 8px;
+  }
+  .page-heading span { display: inline-block; width: 4px; height: 18px; background: #b8860b; border-radius: 3px; }
+
+  .lms-table-wrap {
+    background: #fff; border: 0.5px solid #e8d5a3;
+    border-radius: 12px; overflow: hidden;
+    box-shadow: 0 2px 8px rgba(184,134,11,0.07);
+    margin-bottom: 1.25rem;
+  }
+
+  .lms-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .lms-table thead tr { background: #fdf3d8; border-bottom: 1px solid #e8d5a3; }
+  .lms-table thead th {
+    padding: 11px 14px; font-size: 11.5px; font-weight: 600;
+    color: #7a5800; text-transform: uppercase; letter-spacing: 0.07em; text-align: left;
+  }
+  .lms-table tbody tr { border-bottom: 0.5px solid #f0e8d0; transition: background 0.12s; }
+  .lms-table tbody tr:last-child { border-bottom: none; }
+  .lms-table tbody tr:hover { background: #fffdf7; }
+  .lms-table tbody td { padding: 10px 14px; color: #3a4a5a; vertical-align: middle; }
+
+  .lms-table tbody td img {
+    width: 44px; height: 56px; object-fit: cover;
+    border-radius: 5px; border: 0.5px solid #e8d5a3;
+    margin-right: 8px; vertical-align: middle;
+  }
+
+  .btn-remove {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 5px 11px; font-size: 12px; font-weight: 500;
+    border-radius: 6px; border: 0.5px solid #f5b8b4;
+    background: #fce8e6; color: #d93025;
+    text-decoration: none; transition: background 0.13s;
+  }
+  .btn-remove:hover { background: #d93025; color: #fff; border-color: #d93025; text-decoration: none; }
+
+  /* Summary card */
+  .cart-summary {
+    background: #fff; border: 0.5px solid #e8d5a3;
+    border-radius: 12px; padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(184,134,11,0.07);
+    max-width: 340px; margin-left: auto;
+  }
+
+  .cart-summary h3 {
+    font-size: 14px; font-weight: 600; color: #7a5800;
+    margin-bottom: 1rem; display: flex; align-items: center; gap: 7px;
+  }
+
+  .summary-row {
+    display: flex; justify-content: space-between;
+    font-size: 13px; color: #3a4a5a; padding: 6px 0;
+    border-bottom: 0.5px solid #f0e8d0;
+  }
+  .summary-row:last-of-type { border-bottom: none; }
+  .summary-row.total { font-weight: 700; color: #1a2a4a; font-size: 14px; }
+
+  .btn-checkout {
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    width: 100%; height: 42px; background: #1a2a4a; color: #fff;
+    border: none; border-radius: 8px; font-size: 14px; font-weight: 500;
+    text-decoration: none; margin-top: 1rem; transition: background 0.15s;
+    cursor: pointer;
+  }
+  .btn-checkout:hover { background: #b8860b; color: #fff; text-decoration: none; }
+
+  /* Empty cart */
+  .empty-cart {
+    background: #fff; border: 0.5px solid #e8d5a3;
+    border-radius: 12px; padding: 3rem 2rem;
+    text-align: center; box-shadow: 0 2px 8px rgba(184,134,11,0.07);
+  }
+  .empty-cart .icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+  .empty-cart h3 { font-size: 1rem; font-weight: 600; color: #1a2a4a; margin-bottom: 0.4rem; }
+  .empty-cart p  { font-size: 13px; color: #7a8a9a; margin-bottom: 1.25rem; }
+
+  .btn-browse {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 9px 22px; background: #1a2a4a; color: #fff;
+    border-radius: 8px; font-size: 13.5px; font-weight: 500;
+    text-decoration: none; transition: background 0.15s;
+  }
+  .btn-browse:hover { background: #b8860b; color: #fff; text-decoration: none; }
+</style>
+
+<div class="page-wrap">
+  <div class="page-heading">
+    <span></span> My Cart
+  </div>
+
+  {% if cart and cart.items.all %}
+
+    <div class="lms-table-wrap">
+      <table class="lms-table">
+        <thead>
+          <tr>
+            <th>Book</th>
+            <th>Author</th>
+            <th>Price</th>
+            <th>Qty</th>
+            <th>Subtotal</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in cart.items.all %}
+          <tr>
+            <td>
+              {% if item.book.cover %}
+                <img src="{{ item.book.cover.url }}" alt="{{ item.book.name }}">
+              {% endif %}
+              {{ item.book.name }}
+            </td>
+            <td>{{ item.book.author }}</td>
+            <td>₹{{ item.book.price }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>₹{{ item.book.price }}</td>
+            <td>
+              <a href="{% url 'remove_from_cart' item.id %}" class="btn-remove">
+                <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 2l8 8M10 2l-8 8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+                Remove
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Summary -->
+    <div class="cart-summary">
+      <h3>
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 1h2l1.8 6.5h6.4L13 4H4" stroke="#b8860b" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="5.5" cy="11" r="1" fill="#b8860b"/><circle cx="10.5" cy="11" r="1" fill="#b8860b"/></svg>
+        Order Summary
+      </h3>
+      <div class="summary-row">
+        <span>Items</span>
+        <span>{{ cart.items.count }}</span>
+      </div>
+      <div class="summary-row total">
+        <span>Total</span>
+        <span>₹{{ total_price }}</span>
+      </div>
+      <a href="{% url 'checkout' %}" class="btn-checkout">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M8 4l4 3-4 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Proceed to Checkout
+      </a>
+    </div>
+
+  {% else %}
+
+    <div class="empty-cart">
+      <div class="icon">🛒</div>
+      <h3>Your cart is empty</h3>
+      <p>Looks like you haven't added any books yet.</p>
+      <a href="{% url 'view_books1' %}" class="btn-browse">Browse Books</a>
+    </div>
+
+  {% endif %}
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.lms-vc-toast').forEach(function (t) {
+      setTimeout(function () {
+        t.style.animation = 'lms-fade-out 0.3s ease forwards';
+        setTimeout(function () { t.remove(); }, 300);
+      }, 4000);
+    });
+  });
+</script>
+
+{% endblock %}
